@@ -89,5 +89,39 @@ namespace TCPServer
         {
             return string.Join(" ", _clients.Select(x => x.Name).ToArray());
         }
+
+        public async Task CheckClients()
+        {
+            while (_listening)
+            {
+                for (int i = _clients.Count - 1; i >= 0; i--)
+                {
+                    var client = _clients[i];
+
+                    if (!IsClientConnected(client.Client))
+                    {
+                        Console.WriteLine($"[-] Клиент {client.Name} отключен.");
+                        _clients.RemoveAt(i);
+                    }
+                }
+
+                await Task.Delay(5000);
+            }
+        }
+        
+        // переделать надо на отправку пакета какого нибудь хотя хз
+        private bool IsClientConnected(Socket socket)
+        {
+            try
+            {
+                return !(socket.Poll(1000, SelectMode.SelectRead) && socket.Available == 0);
+            }
+            catch (SocketException)
+            {
+                return false;
+            }
+        }
+
+        
     }
 }
