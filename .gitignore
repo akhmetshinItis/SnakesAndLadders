@@ -1,6 +1,5 @@
 bin/
 obj/
-*.sln
 .DS_Store
 .idea/
 Folder.DotSettings.user

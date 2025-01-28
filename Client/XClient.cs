@@ -19,7 +19,6 @@ namespace TCPClient
 
         public void Connect(string ip, int port)
         {
-            Thread.Sleep(10000);
             Connect(new IPEndPoint(IPAddress.Parse(ip), port));
         }
 

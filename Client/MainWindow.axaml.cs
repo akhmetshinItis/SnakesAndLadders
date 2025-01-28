@@ -58,7 +58,11 @@ namespace Client
                     Name = _textBox.Text,
                 }
                 );
-            client.QueuePacketSend(pack.ToPacket());
+            var encryptedPacket = XProtocolEncryptor.Encrypt(pack.ToPacket());
+            var test = pack.ToPacket();
+            Console.WriteLine($"{test[0]:X2} {test[1]:X2} {test[2]:X2}");
+            Console.WriteLine($"{encryptedPacket[0]:X2}  {encryptedPacket[1]:X2}  {encryptedPacket[2]:X2}");
+            client.QueuePacketSend(encryptedPacket);
         }
 
         private static void OnPacketRecieve(byte[] packet)

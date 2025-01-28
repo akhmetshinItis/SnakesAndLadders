@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{9A28FA9A-9D76-4A59-8E0D-E0D1340BC62B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XProtocol", "XProtocol\XProtocol.csproj", "{91ABAB2E-B87D-46C1-956D-76637274DA46}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{01FA9341-8B6D-4FED-B168-DD9334FEF121}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XOREncryptor", "XOREncryptor\XOREncryptor.csproj", "{12DF96C5-DDFE-465C-8AD0-6F8C703F7BE2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9A28FA9A-9D76-4A59-8E0D-E0D1340BC62B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A28FA9A-9D76-4A59-8E0D-E0D1340BC62B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A28FA9A-9D76-4A59-8E0D-E0D1340BC62B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A28FA9A-9D76-4A59-8E0D-E0D1340BC62B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91ABAB2E-B87D-46C1-956D-76637274DA46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91ABAB2E-B87D-46C1-956D-76637274DA46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91ABAB2E-B87D-46C1-956D-76637274DA46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91ABAB2E-B87D-46C1-956D-76637274DA46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01FA9341-8B6D-4FED-B168-DD9334FEF121}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01FA9341-8B6D-4FED-B168-DD9334FEF121}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01FA9341-8B6D-4FED-B168-DD9334FEF121}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01FA9341-8B6D-4FED-B168-DD9334FEF121}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12DF96C5-DDFE-465C-8AD0-6F8C703F7BE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12DF96C5-DDFE-465C-8AD0-6F8C703F7BE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12DF96C5-DDFE-465C-8AD0-6F8C703F7BE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12DF96C5-DDFE-465C-8AD0-6F8C703F7BE2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
