@@ -413,7 +413,7 @@ namespace XProtocol
 
     // Проверяем, что пакет заканчивается нужными байтами
     var lastIndex = packet.Length - 1;
-    if (packet[lastIndex - 1] != 0xFF || packet[lastIndex] != 0x00)
+    if (packet[lastIndex - 1] != 0xFF || packet[lastIndex] != 0x00 || packet[lastIndex] != 0x79 || packet[lastIndex-1] != 0x97)
     {
         return null; // Неверное завершение пакета
     }
