@@ -1,0 +1,30 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Client.Views.MainWindow"
+        Title="Client"
+		 MinWidth="600"
+        MinHeight="600">
+        <!--<ListBox>
+                <Button Name="Button">Button</Button>
+                <Button Name="Button2" Click="OnClick2">Button2</Button>
+                <TextBox Name="TextBox" Watermark="Name"></TextBox>
+        </ListBox>-->
+	<Grid>
+		<Image Source="/Assets/Images/grass.jpg"
+               Stretch="UniformToFill"
+               HorizontalAlignment="Stretch"
+               VerticalAlignment="Stretch" />
+		<!-- Устанавливаем картинку на фон -->
+		<Image Source="/Assets/Images/board.png"
+       Stretch="Uniform"
+       HorizontalAlignment="Center"
+       VerticalAlignment="Center"
+       Margin="0,50,0,50"/>
+
+
+		<!-- Ваши другие элементы UI, например, кнопки или фишки -->
+	</Grid>
+</Window>
