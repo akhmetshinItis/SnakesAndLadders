@@ -31,13 +31,13 @@ namespace TCPServer
             {
                 var buff = new byte[256]; // Максимальный размер пакета - 256 байт.
                 Client.Receive(buff);
-
+                
                 buff = buff.TakeWhile((b, i) =>
                 {
                     if (b != 0xFF) return true;
                     return buff[i + 1] != 0;
                 }).Concat(new byte[] {0xFF, 0}).ToArray();
-
+                
                 var parsed = XPacket.Parse(buff);
 
                 if (parsed != null)

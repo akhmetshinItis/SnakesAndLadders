@@ -64,7 +64,7 @@ namespace Client
             Console.WriteLine($"{encryptedPacket[0]:X2}  {encryptedPacket[1]:X2}  {encryptedPacket[2]:X2}");
             Console.WriteLine($"{encryptedPacket[^1]:X2}  {encryptedPacket[^2]:X2}  {encryptedPacket[^3]:X2}");
             Console.WriteLine($"{test[^1]:X2}  {test[^2]:X2}  {test[^3]:X2}");
-            client.QueuePacketSend(encryptedPacket);
+            client.QueuePacketSend(test);
         }
 
         private static void OnPacketRecieve(byte[] packet)
