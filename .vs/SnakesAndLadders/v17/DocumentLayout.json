@@ -1,0 +1,156 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Semestrovka2-repository\\SnakesAndLadders\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{01FA9341-8B6D-4FED-B168-DD9334FEF121}|Client\\Client.csproj|d:\\semestrovka2-repository\\snakesandladders\\client\\views\\custommessagebox.axaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{01FA9341-8B6D-4FED-B168-DD9334FEF121}|Client\\Client.csproj|solutionrelative:client\\views\\custommessagebox.axaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{01FA9341-8B6D-4FED-B168-DD9334FEF121}|Client\\Client.csproj|d:\\semestrovka2-repository\\snakesandladders\\client\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{01FA9341-8B6D-4FED-B168-DD9334FEF121}|Client\\Client.csproj|solutionrelative:client\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{01FA9341-8B6D-4FED-B168-DD9334FEF121}|Client\\Client.csproj|d:\\semestrovka2-repository\\snakesandladders\\client\\client.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{01FA9341-8B6D-4FED-B168-DD9334FEF121}|Client\\Client.csproj|solutionrelative:client\\client.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{01FA9341-8B6D-4FED-B168-DD9334FEF121}|Client\\Client.csproj|d:\\semestrovka2-repository\\snakesandladders\\client\\views\\mainwindow.axaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{01FA9341-8B6D-4FED-B168-DD9334FEF121}|Client\\Client.csproj|solutionrelative:client\\views\\mainwindow.axaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{01FA9341-8B6D-4FED-B168-DD9334FEF121}|Client\\Client.csproj|d:\\semestrovka2-repository\\snakesandladders\\client\\app.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{01FA9341-8B6D-4FED-B168-DD9334FEF121}|Client\\Client.csproj|solutionrelative:client\\app.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{01FA9341-8B6D-4FED-B168-DD9334FEF121}|Client\\Client.csproj|d:\\semestrovka2-repository\\snakesandladders\\client\\views\\mainwindow.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{01FA9341-8B6D-4FED-B168-DD9334FEF121}|Client\\Client.csproj|solutionrelative:client\\views\\mainwindow.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{01FA9341-8B6D-4FED-B168-DD9334FEF121}|Client\\Client.csproj|d:\\semestrovka2-repository\\snakesandladders\\client\\views\\custommessagebox.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{01FA9341-8B6D-4FED-B168-DD9334FEF121}|Client\\Client.csproj|solutionrelative:client\\views\\custommessagebox.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{01FA9341-8B6D-4FED-B168-DD9334FEF121}|Client\\Client.csproj|d:\\semestrovka2-repository\\snakesandladders\\client\\views\\custommessagebox.axaml||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{01FA9341-8B6D-4FED-B168-DD9334FEF121}|Client\\Client.csproj|solutionrelative:client\\views\\custommessagebox.axaml||{8B382828-6202-11D1-8870-0000F87579D2}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "App.axaml.cs",
+              "DocumentMoniker": "D:\\Semestrovka2-repository\\SnakesAndLadders\\Client\\App.axaml.cs",
+              "RelativeDocumentMoniker": "Client\\App.axaml.cs",
+              "ToolTip": "D:\\Semestrovka2-repository\\SnakesAndLadders\\Client\\App.axaml.cs",
+              "RelativeToolTip": "Client\\App.axaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-28T15:46:04.784Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "CustomMessageBox.axaml",
+              "DocumentMoniker": "D:\\Semestrovka2-repository\\SnakesAndLadders\\Client\\Views\\CustomMessageBox.axaml",
+              "RelativeDocumentMoniker": "Client\\Views\\CustomMessageBox.axaml",
+              "ToolTip": "D:\\Semestrovka2-repository\\SnakesAndLadders\\Client\\Views\\CustomMessageBox.axaml",
+              "RelativeToolTip": "Client\\Views\\CustomMessageBox.axaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-01-28T15:34:55.987Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Semestrovka2-repository\\SnakesAndLadders\\Client\\Program.cs",
+              "RelativeDocumentMoniker": "Client\\Program.cs",
+              "ToolTip": "D:\\Semestrovka2-repository\\SnakesAndLadders\\Client\\Program.cs",
+              "RelativeToolTip": "Client\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-28T15:38:57.032Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "MainWindow.axaml.cs",
+              "DocumentMoniker": "D:\\Semestrovka2-repository\\SnakesAndLadders\\Client\\Views\\MainWindow.axaml.cs",
+              "RelativeDocumentMoniker": "Client\\Views\\MainWindow.axaml.cs",
+              "ToolTip": "D:\\Semestrovka2-repository\\SnakesAndLadders\\Client\\Views\\MainWindow.axaml.cs",
+              "RelativeToolTip": "Client\\Views\\MainWindow.axaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-28T15:29:23.687Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "MainWindow.axaml",
+              "DocumentMoniker": "D:\\Semestrovka2-repository\\SnakesAndLadders\\Client\\Views\\MainWindow.axaml",
+              "RelativeDocumentMoniker": "Client\\Views\\MainWindow.axaml",
+              "ToolTip": "D:\\Semestrovka2-repository\\SnakesAndLadders\\Client\\Views\\MainWindow.axaml",
+              "RelativeToolTip": "Client\\Views\\MainWindow.axaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-01-28T15:28:01.69Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "CustomMessageBox.axaml.cs",
+              "DocumentMoniker": "D:\\Semestrovka2-repository\\SnakesAndLadders\\Client\\Views\\CustomMessageBox.axaml.cs",
+              "RelativeDocumentMoniker": "Client\\Views\\CustomMessageBox.axaml.cs",
+              "ToolTip": "D:\\Semestrovka2-repository\\SnakesAndLadders\\Client\\Views\\CustomMessageBox.axaml.cs",
+              "RelativeToolTip": "Client\\Views\\CustomMessageBox.axaml.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABMAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-28T15:24:01.88Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Client",
+              "DocumentMoniker": "D:\\Semestrovka2-repository\\SnakesAndLadders\\Client\\Client.csproj",
+              "RelativeDocumentMoniker": "Client\\Client.csproj",
+              "ToolTip": "D:\\Semestrovka2-repository\\SnakesAndLadders\\Client\\Client.csproj",
+              "RelativeToolTip": "Client\\Client.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAABDAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-01-28T15:21:02.352Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "CustomMessageBox.axaml",
+              "DocumentMoniker": "D:\\Semestrovka2-repository\\SnakesAndLadders\\Client\\Views\\CustomMessageBox.axaml",
+              "RelativeDocumentMoniker": "Client\\Views\\CustomMessageBox.axaml",
+              "ToolTip": "D:\\Semestrovka2-repository\\SnakesAndLadders\\Client\\Views\\CustomMessageBox.axaml",
+              "RelativeToolTip": "Client\\Views\\CustomMessageBox.axaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAB7AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-01-28T15:23:36.232Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
