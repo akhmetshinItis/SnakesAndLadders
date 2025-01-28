@@ -237,244 +237,103 @@ namespace XProtocol
 
             return packet.ToArray();
         }
-
-        // public static XPacket Parse(byte[] packet, bool markAsEncrypted = false)
-        // {
-        //     /*
-        //      * Минимальный размер пакета - 7 байт
-        //      * HEADER (3) + TYPE (1) + SUBTYPE (1) + PACKET ENDING (2)
-        //      */
-        //     if (packet.Length < 7)
-        //     {
-        //         return null;
-        //     }
-        //
-        //     var encrypted = false;
-        //
-        //     // Проверяем заголовок
-        //     if (packet[0] != 0xAF ||
-        //         packet[1] != 0xAA ||
-        //         packet[2] != 0xAF)
-        //     {
-        //         var headers = XOREcnryptor.XORDecrypt([ packet[0], packet[1], packet[2] ]);
-        //         if(headers[0] == 0xAF && headers[1] == 0xAA && headers[2] == 0xAF)
-        //         {
-        //             encrypted = true;
-        //         }
-        //         else
-        //         {
-        //             return null;
-        //         }
-        //     }
-        //
-        //     var mIndex = packet.Length - 1;
-        //
-        //     // Проверяем, что бы пакет заканчивался нужными байтами
-        //     if (packet[mIndex - 1] != 0xFF ||
-        //         packet[mIndex] != XOREcnryptor.XOREncrypt([0x00])[0])
-        //     {
-        //         return null;
-        //     }
-        //
-        //     var type = packet[3];
-        //     var subtype = packet[4];
-        //
-        //     var xpacket = new XPacket {PacketType = type, PacketSubtype = subtype, Protected = encrypted};
-        //     
-        //     var fields = packet.Skip(5).ToArray();
-        //     
-        //     while (true)
-        //     {
-        //         if (fields.Length == 2) // Остались последние два байта, завершающие пакет.
-        //         {
-        //             return encrypted ? Parse(XOREcnryptor.XORDecrypt(xpacket.ToPacket())) : xpacket;
-        //         }
-        //
-        //         var id = fields[0];
-        //         var size = fields[1];
-        //
-        //         var contents = size != 0 ?
-        //             fields.Skip(2).Take(size).ToArray() : null;
-        //
-        //         xpacket.Fields.Add(new XPacketField
-        //         {
-        //             FieldID = id,
-        //             FieldSize = size,
-        //             Contents = contents
-        //         });
-        //
-        //         fields = fields.Skip(2 + size).ToArray();
-        //     }
-        // }
         
-    // public static XPacket Parse(byte[] packet, bool markAsEncrypted = false)
-    //     {
-    //         /*
-    //          * Минимальный размер пакета - 7 байт
-    //          * HEADER (3) + TYPE (1) + SUBTYPE (1) + PACKET ENDING (2)
-    //          */
-    //         if (packet.Length < 7)
-    //         {
-    //             return null;
-    //         }
-    //
-    //         var encrypted = false;
-    //
-    //         // Проверяем заголовок
-    //         if (packet[0] != 0xAF ||
-    //             packet[1] != 0xAA ||
-    //             packet[2] != 0xAF)
-    //         {
-    //             if (packet[0] == 0xC7 ||
-    //                 packet[1] == 0xCB ||
-    //                 packet[2] == 0xDD)
-    //             {
-    //                 encrypted = true;
-    //             }
-    //             else
-    //             {
-    //                 return null;
-    //             }
-    //         }
-    //
-    //         var mIndex = packet.Length - 1;
-    //
-    //         // Проверяем, что бы пакет заканчивался нужными байтами
-    //         if (packet[mIndex - 1] != 0xFF ||
-    //             packet[mIndex] != 0x00)
-    //         {
-    //             return null;
-    //         }
-    //     if (encrypted)
-    //     {
-    //         packet = XProtocolEncryptor.Decrypt(packet);
-    //     }
-    //         var type = packet[3];
-    //         var subtype = packet[4];
-    //
-    //         var xpacket = new XPacket {PacketType = type, PacketSubtype = subtype, Protected = markAsEncrypted};
-    //         
-    //         var fields = packet.Skip(5).ToArray();
-    //         
-    //         while (true)
-    //         {
-    //             if (fields.Length == 2) // Остались последние два байта, завершающие пакет.
-    //             {
-    //                 return xpacket;
-    //             }
-    //
-    //             var id = fields[0];
-    //             var size = fields[1];
-    //
-    //             var contents = size != 0 ?
-    //                 fields.Skip(2).Take(size).ToArray() : null;
-    //
-    //             xpacket.Fields.Add(new XPacketField
-    //             {
-    //                 FieldID = id,
-    //                 FieldSize = size,
-    //                 Contents = contents
-    //             });
-    //
-    //             fields = fields.Skip(2 + size).ToArray();
-    //         }
-    //     }
     
     public static XPacket Parse(byte[] packet, bool markAsEncrypted = false)
-{
-    /*
-     * Минимальный размер пакета - 7 байт
-     * HEADER (3) + TYPE (1) + SUBTYPE (1) + PACKET ENDING (2)
-     */
-    if (packet.Length < 7)
     {
-        return null;
-    }
-
-    var isEncrypted = false;
-
-    // Проверяем заголовок
-    if (packet[0] != 0xAF ||
-        packet[1] != 0xAA ||
-        packet[2] != 0xAF)
-    {
-        // Если заголовок зашифрован
-        if (packet[0] == 0xC7 &&
-            packet[1] == 0xCB &&
-            packet[2] == 0xDD)
+        /*
+         * Минимальный размер пакета - 7 байт
+         * HEADER (3) + TYPE (1) + SUBTYPE (1) + PACKET ENDING (2)
+         */
+        if (packet.Length < 7)
         {
-            isEncrypted = true; // Устанавливаем флаг зашифрованного пакета
+            return null;
         }
-        else
+        
+        var isEncrypted = true;
+        
+        // Проверяем заголовок
+        if (packet[0] != 0xAF ||
+            packet[1] != 0xAA ||
+            packet[2] != 0xAF)
         {
-            return null; // Неверный заголовок
+            // Если заголовок зашифрован
+            if (packet[0] == 0xC7 &&
+                packet[1] == 0xCB &&
+                packet[2] == 0xDD)
+            {
+                isEncrypted = true; // Устанавливаем флаг зашифрованного пакета
+            }
+            else
+            {
+                return null; // Неверный заголовок
+            }
+        }
+        
+        // Проверяем, что пакет заканчивается нужными байтами
+        var lastIndex = packet.Length - 1;
+        if (packet[^2] != 0xFF || packet[^1] != 0x00 )
+        {
+            return null; // Неверное завершение пакета
+        }
+        
+        // Если пакет зашифрован, расшифровываем его
+            var newPacket = packet.ToArray();
+        if (isEncrypted)
+        {
+            newPacket = XProtocolEncryptor.Decrypt(packet);
+        }
+        // Извлекаем тип и подтип пакета
+        var type = newPacket[3];
+        var subtype = newPacket[4];
+        
+        // Создаем экземпляр XPacket
+        var xpacket = new XPacket
+        {
+            PacketType = type,
+            PacketSubtype = subtype,
+        };
+        
+        // Начинаем обработку полей, начиная с 5-го байта
+        var fields = newPacket.Skip(5).ToArray();
+        
+        while (true)
+        {
+            // Если остались только два байта завершения, возвращаем результат
+            if (fields.Length == 2 && fields[0] == 0xFF && fields[1] == 0x00)
+            {
+                return xpacket;
+            }
+        
+            if (fields.Length < 2)
+            {
+                return null; // Некорректный пакет, данных меньше минимально возможного
+            }
+        
+            var id = fields[0];
+            var size = fields[1];
+        
+            // Проверяем, достаточно ли данных для текущего поля
+            if (fields.Length < 2 + size)
+            {
+                return null; // Некорректный пакет, данных не хватает
+            }
+        
+            // Извлекаем содержимое поля
+            var contents = size > 0 ? fields.Skip(2).Take(size).ToArray() : null;
+        
+            // Добавляем поле в список
+            xpacket.Fields.Add(new XPacketField
+            {
+                FieldID = id,
+                FieldSize = size,
+                Contents = contents
+            });
+        
+            // Пропускаем обработанное поле
+            fields = fields.Skip(2 + size).ToArray();
         }
     }
-
-    // Проверяем, что пакет заканчивается нужными байтами
-    var lastIndex = packet.Length - 1;
-    if (packet[lastIndex - 1] != 0xFF || packet[lastIndex] != 0x00)
-    {
-        return null; // Неверное завершение пакета
-    }
-
-    // Если пакет зашифрован, расшифровываем его
-    if (isEncrypted)
-    {
-        packet = XProtocolEncryptor.Decrypt(packet);
-    }
-
-    // Извлекаем тип и подтип пакета
-    var type = packet[3];
-    var subtype = packet[4];
-
-    // Создаем экземпляр XPacket
-    var xpacket = new XPacket
-    {
-        PacketType = type,
-        PacketSubtype = subtype,
-    };
-
-    // Начинаем обработку полей, начиная с 5-го байта
-    var fields = packet.Skip(5).ToArray();
-
-    while (true)
-    {
-        // Если остались только два байта завершения, возвращаем результат
-        if (fields.Length == 2 && fields[0] == 0xFF && fields[1] == 0x00)
-        {
-            return xpacket;
-        }
-
-        if (fields.Length < 2)
-        {
-            return null; // Некорректный пакет, данных меньше минимально возможного
-        }
-
-        var id = fields[0];
-        var size = fields[1];
-
-        // Проверяем, достаточно ли данных для текущего поля
-        if (fields.Length < 2 + size)
-        {
-            return null; // Некорректный пакет, данных не хватает
-        }
-
-        // Извлекаем содержимое поля
-        var contents = size > 0 ? fields.Skip(2).Take(size).ToArray() : null;
-
-        // Добавляем поле в список
-        xpacket.Fields.Add(new XPacketField
-        {
-            FieldID = id,
-            FieldSize = size,
-            Contents = contents
-        });
-
-        // Пропускаем обработанное поле
-        fields = fields.Skip(2 + size).ToArray();
-    }
-}
 
 
         public static XPacket EncryptPacket(XPacket packet)

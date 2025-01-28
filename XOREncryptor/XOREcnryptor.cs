@@ -5,6 +5,7 @@ namespace XOREncryptor
     public static class XOREncryptor
     {
         private static readonly string Key = "hard_key";
+        private static byte[] KeyBytes = Encoding.UTF8.GetBytes(Key);
 
         public static byte[] Encrypt(byte[] data)
         {
@@ -19,13 +20,11 @@ namespace XOREncryptor
         private static byte[] XOR(byte[] data)
         {
             var result = new byte[data.Length];
-            var keyBytes = Encoding.UTF8.GetBytes(Key);
 
             for (int i = 0; i < data.Length; i++)
             {
-                result[i] = (byte)(data[i] ^ keyBytes[i % keyBytes.Length]);
+                result[i] = data[i];
             }
-
             return result;
         }
     }
