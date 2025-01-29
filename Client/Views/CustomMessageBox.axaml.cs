@@ -1,86 +1,85 @@
 ﻿using System;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Shapes; // Для использования Path
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Avalonia.Threading;
 
 namespace Client.Views
 {
     public partial class CustomMessageBox : Window
     {
         private string _selectedColor = "None"; // Хранит выбранный цвет
+        private string _playerName = ""; // Хранит имя игрока
+        private readonly MainWindow _mainWindow;
 
-        public CustomMessageBox(string message)
+
+
+        //public CustomMessageBox()
+        //{
+        //    InitializeComponent(); // Загружаем XAML перед изменениями
+        //}
+        public CustomMessageBox(MainWindow mainWindow)
         {
+            _mainWindow = mainWindow;  // Сохраняем ссылку на главное окно
             InitializeComponent();
-            if (MessageText != null)
-            {
-                MessageText.Text = message; // Установить текст сообщения
-            }
         }
 
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
-
-        // Обработчик выбора цвета
         private void OnColorSelected(object sender, RoutedEventArgs e)
         {
             if (sender is Button clickedButton)
             {
-                // Получаем цвет из Tag кнопки
                 string selectedColor = clickedButton.Tag?.ToString() ?? "None";
                 Console.WriteLine($"Выбран цвет: {selectedColor}");
 
-                // Если выбран новый цвет, обновляем выбранный цвет
                 if (_selectedColor != selectedColor)
                 {
                     _selectedColor = selectedColor;
+                    ResetButtonBorders(); // Сбрасываем обводку перед установкой новой
 
-                    // Сбрасываем рамки у всех кнопок
-                    ResetButtonBorders();
-
-                    // Устанавливаем рамку на выбранной кнопке
-                    clickedButton.BorderBrush = Brushes.Black;
-                    clickedButton.BorderThickness = new Thickness(3);
+                    // Добавляем задержку, чтобы убедиться, что изменения применяются
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        clickedButton.BorderBrush = Brushes.Black;
+                        clickedButton.BorderThickness = new Thickness(3);
+                    }, Avalonia.Threading.DispatcherPriority.Background);
                 }
             }
         }
 
-        // Сброс границ у всех кнопок
         private void ResetButtonBorders()
         {
-            // Проверка и сброс всех кнопок
-            if (RedButton != null)
+            var buttons = new[] { RedButton, GreenButton, YellowButton, BlueButton };
+
+            foreach (var button in buttons)
             {
-                RedButton.BorderBrush = Brushes.Transparent;
-                RedButton.BorderThickness = new Thickness(0);
-            }
-            if (GreenButton != null)
-            {
-                GreenButton.BorderBrush = Brushes.Transparent;
-                GreenButton.BorderThickness = new Thickness(0);
-            }
-            if (YellowButton != null)
-            {
-                YellowButton.BorderBrush = Brushes.Transparent;
-                YellowButton.BorderThickness = new Thickness(0);
-            }
-            if (BlueButton != null)
-            {
-                BlueButton.BorderBrush = Brushes.Transparent;
-                BlueButton.BorderThickness = new Thickness(0);
+                if (button != null)
+                {
+                    button.BorderBrush = Brushes.Transparent;
+                    button.BorderThickness = new Thickness(0);
+                }
             }
         }
 
-        // Обработчик нажатия OK
+        //private void OnOkButtonClick(object sender, RoutedEventArgs e)
+        //{
+        //    Console.WriteLine($"Выбранный цвет: {_selectedColor} перед закрытием");
+        //    Close();
+        //}
         private void OnOkButtonClick(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine($"Выбранный цвет: {_selectedColor} перед закрытием");
-            this.Close(); // Закрыть окно только при нажатии "OK"
+            _playerName = UserInputTextBox.Text; // Получаем имя игрока из текстового поля
+
+            if (!string.IsNullOrWhiteSpace(_playerName) && _selectedColor != "None")
+            {
+                // Добавляем информацию о игроке в список
+                _mainWindow.AddPlayerInfo(_playerName, _selectedColor);
+
+                // Закрыть окно после нажатия "OK"
+                Close();
+            }
+
         }
     }
 }

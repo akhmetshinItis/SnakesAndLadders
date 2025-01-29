@@ -1,7 +1,11 @@
 using System;
+using System.Drawing;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
+using Avalonia.Media;
 using Client.Views;
 using TCPClient;
 using XProtocol;
@@ -15,13 +19,69 @@ namespace Client.Views
         {
             InitializeComponent();
             this.Show(); // Сначала показываем главное окно
-            ShowCustomMessageBox("сообщение"); // Затем открываем окно для ввода имени
+            ShowCustomMessageBox(); // Затем открываем окно для ввода имени
         }
-        private async void ShowCustomMessageBox(string message)
+        private async void ShowCustomMessageBox()
         {
-            var messageBox = new CustomMessageBox(message);
-            await messageBox.ShowDialog(this);
+            //var messageBox = new CustomMessageBox();
+            //await messageBox.ShowDialog(this);
+            var customMessageBox = new CustomMessageBox(this);  // Передаем текущий MainWindow
+            customMessageBox.ShowDialog(this);  // Показываем окно
+
         }
+
+        // Метод для добавления игрока и его цвета в список
+        //public void AddPlayerInfo(string playerName, string color)
+        //{
+        //    // Создаем новый TextBlock с информацией о игроке
+        //    var playerInfoText = new TextBlock
+        //    {
+        //        Text = $"{playerName} - {color}",
+        //        Foreground = Brushes.Black,
+        //        FontWeight = FontWeight.Bold,
+        //        FontSize = 16
+        //    };
+
+        //    // Добавляем этот элемент в PlayersListPanel
+        //    PlayersListPanel.Children.Add(playerInfoText);
+        //}
+        public void AddPlayerInfo(string playerName, string color)
+        {
+            // Создаем новый StackPanel для каждого игрока
+            var playerPanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 10
+            };
+
+            // Создаем TextBlock с именем игрока
+            var playerInfoText = new TextBlock
+            {
+                Text = playerName,
+                Foreground = Brushes.Black,
+                FontSize = 18,
+                FontWeight = FontWeight.Bold
+            };
+
+            // Создаем Path для фишки игрока с нужным цветом
+            var playerColorPath = new Path
+            {
+                Width = 30,
+                Height = 30,
+                Data = Geometry.Parse("M 12,2 A 10,10 0 1,0 12,22 A 10,10 0 1,0 12,2 Z"), // Пример SVG
+                Fill = new SolidColorBrush(Avalonia.Media.Color.Parse(color)),// Используем Avalonia.Media.Color.Parse
+                Stroke = Brushes.Black, // Черная обводка
+                StrokeThickness = 1 // Толщина обводки 1 пиксель
+            };
+
+            // Добавляем текст и фишку в StackPanel игрока
+            playerPanel.Children.Add(playerColorPath);
+            playerPanel.Children.Add(playerInfoText);
+
+            // Добавляем созданный элемент в PlayersListPanel
+            PlayersListPanel.Children.Add(playerPanel);
+        }
+
         //private Button? _button;
         //private TextBox _textBox;
 
