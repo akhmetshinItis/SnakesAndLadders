@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text.Json;
 using XProtocol;
 using XProtocol.Serializator;
 
@@ -70,24 +71,20 @@ namespace TCPServer
             }
         }
 
-        public void SendToClients()
+        public void SendToClients(ConnectedClient callingClient, XPacket packet)
         {
             foreach (var client in _clients)
             {
-                var pack = XPacketConverter.Serialize(
-                    XPacketType.NewPlayer,
-                    new XPacketPlayer
-                    {
-                        Count = 0,
-                        Name = GetClientsNames(),
-                    }).ToPacket();
-                client.QueuePacketSend(pack);
+                if (client != callingClient)
+                {
+                    client.QueuePacketSend(packet.ToPacket());
+                }
             }
         }
 
-        private string GetClientsNames()
+        public string GetClientsNames()
         {
-            return string.Join(" ", _clients.Select(x => x.Name).ToArray());
+            return JsonSerializer.Serialize(_clients.Select(c => c.Name).ToList());
         }
 
         public async Task CheckClients()

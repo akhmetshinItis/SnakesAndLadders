@@ -10,6 +10,7 @@ namespace TCPClient
 {
     public class XClient
     {
+        // TODO: добавить идентификатор
         public Action<byte[]> OnPacketRecieve { get; set; }
 
         private readonly Queue<byte[]> _packetSendingQueue = new Queue<byte[]>();

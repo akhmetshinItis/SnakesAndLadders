@@ -61,6 +61,9 @@ namespace TCPServer
                 case XPacketType.NewPlayer:
                     ProcessNewPlayer(packet);
                     break;
+                case XPacketType.RequestPlayerInfo:
+                    ProcessRequestPlayerInfo(packet);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -86,8 +89,14 @@ namespace TCPServer
             Console.WriteLine("Player Count " + player.Count);
             Name = player.Name;
             
-            QueuePacketSend(XPacketConverter.Serialize(XPacketType.NewPlayer, player).ToPacket());
-            Server.SendToClients();
+            // QueuePacketSend(XPacketConverter.Serialize(XPacketType.NewPlayer, player).ToPacket());
+            Server.SendToClients(this, XPacketConverter.Serialize(XPacketType.NewPlayer, player));
+        }
+
+        private async void ProcessRequestPlayerInfo(XPacket packet)
+        {
+            Console.WriteLine("Recieved request player info packet.");
+            QueuePacketSend(XPacketConverter.Serialize(XPacketType.PlayersInfo, Server.GetClientsNames()).ToPacket()); 
         }
 
         public void QueuePacketSend(byte[] packet)

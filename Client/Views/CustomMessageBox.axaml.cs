@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes; // Для использования Path
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Client.Network;
 
 namespace Client.Views
 {
@@ -50,6 +52,29 @@ namespace Client.Views
             }
         }
 
+        // TEST
+        private async void TestCaller(object sender, RoutedEventArgs e)
+        {
+            await Test();
+        }
+        
+        private async Task Test()
+        {
+            await PacketProcessor.ConnectAndSendHandshakeAsync();
+        }
+
+        private async void TestCaller2(object sender, RoutedEventArgs e)
+        {
+            await Test2();
+        }
+
+        private async Task Test2()
+        {
+            await PacketProcessor.ConnectAndSendHandshakeAsync();
+        }
+
+        // TEST
+        
         // Сброс границ у всех кнопок
         private void ResetButtonBorders()
         {
