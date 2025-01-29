@@ -5,13 +5,8 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Client.Views.MainWindow"
         Title="Client"
-		 MinWidth="600"
+        MinWidth="600"
         MinHeight="600">
-        <!--<ListBox>
-                <Button Name="Button">Button</Button>
-                <Button Name="Button2" Click="OnClick2">Button2</Button>
-                <TextBox Name="TextBox" Watermark="Name"></TextBox>
-        </ListBox>-->
 	<Grid>
 		<Image Source="/Assets/Images/grass.jpg"
                Stretch="UniformToFill"
@@ -19,11 +14,29 @@
                VerticalAlignment="Stretch" />
 		<!-- Устанавливаем картинку на фон -->
 		<Image Source="/Assets/Images/board.png"
-       Stretch="Uniform"
-       HorizontalAlignment="Center"
-       VerticalAlignment="Center"
-       Margin="0,50,0,50"/>
+               Stretch="Uniform"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               Margin="0,50,0,50" />
 
+		<!-- Лист для отображения имен игроков и их фишек -->
+		<StackPanel x:Name="PlayersListPanel"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Margin="50,50,0,0"
+                    Spacing="10"
+                    Background="LightSkyBlue"
+					MinHeight="200"
+					MinWidth="200">
+			<StackPanel.Background>
+				<ImageBrush Source="/Assets/Images/p2.jpg" Stretch="UniformToFill"/>
+			</StackPanel.Background>
+			<!-- Сюда будут добавляться имена и цвета игроков -->
+			<!--<TextBlock Text="Игрок 1 - Красный" Foreground="White" FontSize="16" FontWeight="Bold"/>
+			<TextBlock Text="Игрок 2 - Синий" Foreground="White" FontSize="16" FontWeight="Bold"/>-->
+			<!-- Пример игроков -->
+
+		</StackPanel>
 
 		<!-- Ваши другие элементы UI, например, кнопки или фишки -->
 	</Grid>
