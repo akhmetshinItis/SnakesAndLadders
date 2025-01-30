@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
@@ -14,6 +15,7 @@ using Client.Views;
 using TCPClient;
 using XProtocol;
 using XProtocol.Serializator;
+using static System.Net.WebRequestMethods;
 using Path = Avalonia.Controls.Shapes.Path;
 
 namespace Client.Views
@@ -42,31 +44,48 @@ namespace Client.Views
 
         }
 
-        // ����� ��� ���������� ������ � ��� ����� � ������
         //public void AddPlayerInfo(string playerName, string color)
         //{
-        //    // ������� ����� TextBlock � ����������� � ������
-        //    var playerInfoText = new TextBlock
+        //    var playerPanel = new StackPanel
         //    {
-        //        Text = $"{playerName} - {color}",
-        //        Foreground = Brushes.Black,
-        //        FontWeight = FontWeight.Bold,
-        //        FontSize = 16
+        //        Orientation = Orientation.Horizontal,
+        //        Spacing = 10
         //    };
 
-        //    // ��������� ���� ������� � PlayersListPanel
-        //    PlayersListPanel.Children.Add(playerInfoText);
+
+        //    var playerInfoText = new TextBlock
+        //    {
+        //        Text = playerName,
+        //        Foreground = Brushes.Black,
+        //        FontSize = 18,
+        //        FontWeight = FontWeight.Bold
+        //    };
+
+
+        //    var playerColorPath = new Path
+        //    {
+        //        Width = 30,
+        //        Height = 30,
+        //        Data = Geometry.Parse("M 12,2 A 10,10 0 1,0 12,22 A 10,10 0 1,0 12,2 Z"),
+        //        Fill = new SolidColorBrush(Avalonia.Media.Color.Parse(color)),
+        //        Stroke = Brushes.Black, 
+        //        StrokeThickness = 1 
+        //    };
+
+        //    playerPanel.Children.Add(playerColorPath);
+        //    playerPanel.Children.Add(playerInfoText);
+
+        //    PlayersListPanel.Children.Add(playerPanel);
         //}
+
         public void AddPlayerInfo(string playerName, string color)
         {
-            // ������� ����� StackPanel ��� ������� ������
             var playerPanel = new StackPanel
             {
                 Orientation = Orientation.Horizontal,
                 Spacing = 10
             };
 
-            // ������� TextBlock � ������ ������
             var playerInfoText = new TextBlock
             {
                 Text = playerName,
@@ -75,30 +94,91 @@ namespace Client.Views
                 FontWeight = FontWeight.Bold
             };
 
-            // ������� Path ��� ����� ������ � ������ ������
             var playerColorPath = new Path
             {
                 Width = 30,
                 Height = 30,
-                Data = Geometry.Parse("M 12,2 A 10,10 0 1,0 12,22 A 10,10 0 1,0 12,2 Z"), // ������ SVG
-                Fill = new SolidColorBrush(Avalonia.Media.Color.Parse(color)),// ���������� Avalonia.Media.Color.Parse
-                Stroke = Brushes.Black, // ������ �������
-                StrokeThickness = 1 // ������� ������� 1 �������
+                Data = Geometry.Parse("M 12,2 A 10,10 0 1,0 12,22 A 10,10 0 1,0 12,2 Z"),
+                Fill = new SolidColorBrush(Avalonia.Media.Color.Parse(color)),
+                Stroke = Brushes.Black,
+                StrokeThickness = 1
             };
 
-            // ��������� ����� � ����� � StackPanel ������
             playerPanel.Children.Add(playerColorPath);
             playerPanel.Children.Add(playerInfoText);
 
-            // ��������� ��������� ������� � PlayersListPanel
             PlayersListPanel.Children.Add(playerPanel);
+
+            // Добавляем фишку игрока
+            AddPlayerToken(color);
         }
-        
+
+
+        //    private void AddPlayerToken(string color)
+        //{
+        //    var token = new Path
+        //    {
+        //        Width = 30,
+        //        Height = 80,
+        //        Data = Geometry.Parse(" M 15,5 C 22,5 25,12 25,20 C 25,25 22,30 18,34 C 28,45 30,65 27,80 L 3,80 C 0,65 2,45 12,34 C 8,30 5,25 5,20 C 5,12 8,5 15,5 Z"),
+
+        //        Fill = new SolidColorBrush(Avalonia.Media.Color.Parse(color)),
+        //        Stroke = Brushes.Black,
+        //        StrokeThickness = 1.5
+        //    };
+
+        //    var tokenContainer = new Canvas
+        //    {
+        //        Width = 50,
+        //        Height = 100
+        //    };
+
+        //    tokenContainer.Children.Add(token);
+
+        //    // Устанавливаем позицию фишки внизу слева
+        //    Canvas.SetLeft(tokenContainer, 100); // Отступ слева
+        //    Canvas.SetTop(tokenContainer, MainGrid.Bounds.Height - 100); // Отступ снизу
+
+        //    MainGrid.Children.Add(tokenContainer);
+        //}
+        private void AddPlayerToken(string color)
+        {
+            var token = new Path
+            {
+                Width = 30,
+                Height = 80,
+                Data = Geometry.Parse("M 15,5 C 22,5 25,12 25,20 C 25,25 22,30 18,34 C 28,45 30,65 27,80 L 3,80 C 0,65 2,45 12,34 C 8,30 5,25 5,20 C 5,12 8,5 15,5 Z"),
+                Fill = new SolidColorBrush(Avalonia.Media.Color.Parse(color)),
+                Stroke = Brushes.Black,
+                StrokeThickness = 1.5
+            };
+
+            var tokenContainer = new Canvas
+            {
+                Width = 50,
+                Height = 100
+            };
+
+            tokenContainer.Children.Add(token);
+            MainGrid.Children.Add(tokenContainer);
+
+            // Гарантируем, что MainGrid уже имеет размеры
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                double xPos = 100; // Отступ слева
+                double yPos = MainGrid.Bounds.Height - 110; // Отступ от нижней границы
+
+                Canvas.SetLeft(tokenContainer, xPos);
+                Canvas.SetTop(tokenContainer, yPos);
+            }, DispatcherPriority.Background);
+        }
+
+
         // логика кубикка
         protected override void OnOpened(EventArgs e)
         {
             base.OnOpened(e);
-
+         
             _imageView = this.FindControl<Image>("ImageView");
             _toggleButton = this.FindControl<Button>("ToggleButton");
 

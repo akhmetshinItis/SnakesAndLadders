@@ -5,7 +5,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Client.Views.MainWindow"
         Title="Client"
-        MinWidth="600"
+        MinWidth="1050"
         MinHeight="600">
 	<Grid>
 		<Image Source="/Assets/Images/grass.jpg"
@@ -38,7 +38,13 @@
 			<!-- Пример игроков -->
 
 		</StackPanel>
-		
+
+
+		<Canvas x:Name="MainGrid"
+				HorizontalAlignment="Stretch"
+				VerticalAlignment="Stretch"/>
+
+
 		<!-- Кубик -->
 		<StackPanel HorizontalAlignment="Right"
 		            VerticalAlignment="Bottom"
@@ -51,4 +57,5 @@
 		<!-- Ваши другие элементы UI, например, кнопки или фишки -->
 		
 	</Grid>
+	
 </Window>

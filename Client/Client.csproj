@@ -25,6 +25,11 @@
 	<ItemGroup>
 		<AvaloniaResource Include="Assets\Images\*.*"></AvaloniaResource>
 	</ItemGroup>
+	<ItemGroup>
+		<None Update="Assets\Images\cube\*.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
     <ItemGroup>
       <Folder Include="Assets\Images\" />
     </ItemGroup>
