@@ -1,19 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
-using Client.Views;
-using TCPClient;
-using XProtocol;
-using XProtocol.Serializator;
 using Path = Avalonia.Controls.Shapes.Path;
 
 namespace Client.Views
