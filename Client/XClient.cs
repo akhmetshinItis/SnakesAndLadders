@@ -12,14 +12,23 @@ namespace TCPClient
     public class XClient
     {
         public string? Name { get; set; }
+        
+        // Послание Тимерхану Аглямовичу от Тагира
+        
+        /// <summary>
+        /// ЧЕСТНО СКАЖУ С ГПТ ВЗЯЛ, после того как у меня утекло 50гб памяти
+        /// понятия не имею зачем тут какой-то конкурент кью
+        /// </summary>
         private readonly ConcurrentQueue<byte[]> _packetSendingQueue = new ConcurrentQueue<byte[]>();
+        
+        /// <summary>
+        /// Это тоже не знаю зачем, разберусь с этим всем обязательно, когда время будет,
+        /// пока на результат работаем, а не на качество
+        /// ну и надеюсь что мне ближайшее время не пригодится такими вещами пользоваться
+        /// </summary>
         private readonly ManualResetEventSlim _packetAvailable = new ManualResetEventSlim(false);
-
-        // TODO: добавить идентификатор
         public Action<byte[]> OnPacketRecieve { get; set; }
-
-        // private readonly Queue<byte[]> _packetSendingQueue = new Queue<byte[]>();
-
+        
         private Socket _socket;
         private IPEndPoint _serverEndPoint;
 
@@ -104,24 +113,7 @@ namespace TCPClient
                 return i + 1 < packet.Length && packet[i + 1] != 0;
             }).Concat(new byte[] { 0xFF, 0 }).ToArray();
         }
-
-
-        // private void SendPackets()
-        // {
-        //     while (true)
-        //     {
-        //         if (_packetSendingQueue.Count == 0)
-        //         {
-        //             Thread.Sleep(100);
-        //             continue;
-        //         }
-        //
-        //         var packet = _packetSendingQueue.Dequeue();
-        //         _socket.Send(packet);
-        //
-        //         Thread.Sleep(100);
-        //     }
-        // }
+        
         private void SendPackets()
         {
             while (_socket.Connected)
