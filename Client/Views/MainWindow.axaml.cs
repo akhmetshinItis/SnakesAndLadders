@@ -19,19 +19,20 @@ namespace Client.Views
         private bool _isRunning = false;
         private Image? _imageView;
         private Button? _toggleButton;
-        
+
         public MainWindow()
         {
             InitializeComponent();
             this.Show(); // ������� ���������� ������� ����
             ShowCustomMessageBox(); // ����� ��������� ���� ��� ����� �����
         }
+
         private async void ShowCustomMessageBox()
         {
             //var messageBox = new CustomMessageBox();
             //await messageBox.ShowDialog(this);
             var customMessageBox = new CustomMessageBox(this);  // �������� ������� MainWindow
-            customMessageBox.ShowDialog(this);  // ���������� ����
+            await customMessageBox.ShowDialog(this);  // ���������� ����
 
         }
 
@@ -146,38 +147,5 @@ namespace Client.Views
             string randomImage = _imagePaths[_random.Next(_imagePaths.Count)];
             _imageView.Source = new Bitmap(randomImage);
         }
-
-        //private Button? _button;
-        //private TextBox _textBox;
-
-        //public MainWindow()
-        //{
-        //    InitializeComponent();
-        //    _button = this.FindControl<Button>("Button");
-        //    _textBox = this.FindControl<TextBox>("TextBox");
-        //    _button.Click += OnClick;
-        //}
-
-        //private async void OnClick(object? sender, RoutedEventArgs e)
-        //{
-        //    _button.IsEnabled = false;
-        //    Console.WriteLine(1);
-        //    try
-        //    {
-        //        await ConnectAndSendAsync();
-        //    }
-        //    finally
-        //    {
-        //        _button.IsEnabled = true;
-        //    }
-
-        //    Console.WriteLine(2);
-        //}
-
-        //private async void OnClick2(object? sender, RoutedEventArgs e)
-        //{
-        //    Console.WriteLine("OnClick2");
-        //}
-        
     }
 }

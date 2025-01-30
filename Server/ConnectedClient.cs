@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Net.Sockets;
+using System.Text.Json;
 using XProtocol;
 using XProtocol.Serializator;
 
@@ -12,8 +8,11 @@ namespace TCPServer
     internal class ConnectedClient
     {
         public string Name { get; set; }
+        
+        public int Color { get; set; }
         public Server Server { get; set; }
         public Socket Client { get; }
+        public bool IsConnected => Client != null && Client.Connected;
         
         private readonly Queue<byte[]> _packetSendingQueue = new Queue<byte[]>();
 
@@ -27,25 +26,43 @@ namespace TCPServer
 
         private void ProcessIncomingPackets()
         {
-            while (true) // Слушаем пакеты, пока клиент не отключится.
+            try
             {
-                var buff = new byte[256]; // Максимальный размер пакета - 256 байт.
-                Client.Receive(buff);
-                
-                buff = buff.TakeWhile((b, i) =>
+                while (IsConnected) // Проверяем, подключен ли клиент
                 {
-                    if (b != 0xFF) return true;
-                    return buff[i + 1] != 0;
-                }).Concat(new byte[] {0xFF, 0}).ToArray();
-                
-                var parsed = XPacket.Parse(buff);
+                    var buff = new byte[256]; // Выделяем память под буфер
+                    int received = Client.Receive(buff); // Получаем данные
 
-                if (parsed != null)
-                {
-                    ProcessIncomingPacket(parsed);
+                    if (received == 0) // Если получили 0 байт, значит соединение закрыто
+                    {
+                        Console.WriteLine("Client disconnected.");
+                        break;
+                    }
+
+                    // Обрезаем лишние данные
+                    buff = buff.Take(received)
+                        .TakeWhile((b, i) => i < received - 1 && !(b == 0xFF && buff[i + 1] == 0))
+                        .Concat(new byte[] { 0xFF, 0 })
+                        .ToArray();
+
+                    var parsed = XPacket.Parse(buff);
+
+                    if (parsed != null)
+                    {
+                        ProcessIncomingPacket(parsed);
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in packet processing: {ex.Message}");
+            }
+            finally
+            {
+                Console.WriteLine("Stopping packet processing...");
+            }
         }
+
 
         private void ProcessIncomingPacket(XPacket packet)
         {
@@ -85,18 +102,23 @@ namespace TCPServer
         {
             Console.WriteLine("Recieved new player packet.");
             var player = XPacketConverter.Deserialize<XPacketPlayer>(packet);
-            Console.WriteLine("Player name: " + player.Name);
-            Console.WriteLine("Player Count " + player.Count);
+            Console.WriteLine("Player Name: " + player.Name);
+            Console.WriteLine("Player Color " + player.Color);
             Name = player.Name;
+            Color = player.Color;
             
             // QueuePacketSend(XPacketConverter.Serialize(XPacketType.NewPlayer, player).ToPacket());
             Server.SendToClients(this, XPacketConverter.Serialize(XPacketType.NewPlayer, player));
         }
 
-        private async void ProcessRequestPlayerInfo(XPacket packet)
+        private async Task ProcessRequestPlayerInfo(XPacket packet)
         {
             Console.WriteLine("Recieved request player info packet.");
-            QueuePacketSend(XPacketConverter.Serialize(XPacketType.PlayersInfo, Server.GetClientsNames()).ToPacket()); 
+            await Server.SendAllClientsToCaller(this);
+            // var names = Server.GetClientsNames();
+            // var serialized = JsonSerializer.Serialize(names);
+            // var pack = XPacketConverter.Serialize(XPacketType.PlayersInfo, new XPacketPlayerInfo{InformationJson = serialized});
+            // QueuePacketSend(pack.ToPacket()); 
         }
 
         public void QueuePacketSend(byte[] packet)

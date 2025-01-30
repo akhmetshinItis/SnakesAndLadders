@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -7,6 +8,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Client.Network;
+using Colors = Client.Enums.Colors;
 
 namespace Client.Views
 {
@@ -27,7 +29,7 @@ namespace Client.Views
             _mainWindow = mainWindow;  // Сохраняем ссылку на главное окно
             InitializeComponent();
         }
-
+        
         private void OnColorSelected(object sender, RoutedEventArgs e)
         {
             if (sender is Button clickedButton)
@@ -85,25 +87,32 @@ namespace Client.Views
                 }
             }
         }
-
-        //private void OnOkButtonClick(object sender, RoutedEventArgs e)
-        //{
-        //    Console.WriteLine($"Выбранный цвет: {_selectedColor} перед закрытием");
-        //    Close();
-        //}
-        private void OnOkButtonClick(object sender, RoutedEventArgs e)
+        
+        private async void OnOkButtonClick(object sender, RoutedEventArgs e)
         {
             _playerName = UserInputTextBox.Text; // Получаем имя игрока из текстового поля
 
             if (!string.IsNullOrWhiteSpace(_playerName) && _selectedColor != "None")
             {
-                // Добавляем информацию о игроке в список
                 _mainWindow.AddPlayerInfo(_playerName, _selectedColor);
-
-                // Закрыть окно после нажатия "OK"
+                
+                try
+                {
+                    await PacketProcessor.ConnectAndSendHandshakeAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Подключение не удалось: " + ex.Message);
+                }
+                
+                PacketProcessor.MainWindow = _mainWindow;
+                await Task.Delay(100); // Ждем немного перед отправкой
+                await PacketSender.SendNewPlayerPacket(_playerName, Colors.GetColorId(_selectedColor)); // Теперь await
+                await Task.Delay(100);
+                await PacketSender.SendPlayersInfoRequest();
                 Close();
             }
-
+        }
         }
     }
-}
+
