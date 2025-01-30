@@ -12,7 +12,8 @@
                Stretch="UniformToFill"
                HorizontalAlignment="Stretch"
                VerticalAlignment="Stretch" />
-		<!-- Устанавливаем картинку на фон -->
+		
+		<!-- Игровое поле -->
 		<Image Source="/Assets/Images/board.png"
                Stretch="Uniform"
                HorizontalAlignment="Center"
@@ -37,7 +38,17 @@
 			<!-- Пример игроков -->
 
 		</StackPanel>
-
+		
+		<!-- Кубик -->
+		<StackPanel HorizontalAlignment="Right"
+		            VerticalAlignment="Bottom"
+		            Margin="150,0,20,50"
+		            Spacing="10">
+			<Image x:Name="ImageView" Width="100" Height="100" Stretch="Uniform"/>
+			<Button x:Name="ToggleButton" Content="Старт / Стоп" Width="120" Height="40"/>
+		</StackPanel>
+		
 		<!-- Ваши другие элементы UI, например, кнопки или фишки -->
+		
 	</Grid>
 </Window>
