@@ -1,39 +1,51 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Avalonia.Controls.Shapes;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 using Client.Views;
 using TCPClient;
 using XProtocol;
 using XProtocol.Serializator;
+using Path = Avalonia.Controls.Shapes.Path;
 
 namespace Client.Views
 {
     public partial class MainWindow : Window
     {
+        private List<string> _imagePaths = new(); 
+        private readonly Random _random = new();
+        private DispatcherTimer? _timer;
+        private bool _isRunning = false;
+        private Image? _imageView;
+        private Button? _toggleButton;
+        
         public MainWindow()
         {
             InitializeComponent();
-            this.Show(); // Сначала показываем главное окно
-            ShowCustomMessageBox(); // Затем открываем окно для ввода имени
+            this.Show(); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+            ShowCustomMessageBox(); // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
         }
         private async void ShowCustomMessageBox()
         {
             //var messageBox = new CustomMessageBox();
             //await messageBox.ShowDialog(this);
-            var customMessageBox = new CustomMessageBox(this);  // Передаем текущий MainWindow
-            customMessageBox.ShowDialog(this);  // Показываем окно
+            var customMessageBox = new CustomMessageBox(this);  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ MainWindow
+            customMessageBox.ShowDialog(this);  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 
         }
 
-        // Метод для добавления игрока и его цвета в список
+        // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         //public void AddPlayerInfo(string playerName, string color)
         //{
-        //    // Создаем новый TextBlock с информацией о игроке
+        //    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ TextBlock пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         //    var playerInfoText = new TextBlock
         //    {
         //        Text = $"{playerName} - {color}",
@@ -42,19 +54,19 @@ namespace Client.Views
         //        FontSize = 16
         //    };
 
-        //    // Добавляем этот элемент в PlayersListPanel
+        //    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ PlayersListPanel
         //    PlayersListPanel.Children.Add(playerInfoText);
         //}
         public void AddPlayerInfo(string playerName, string color)
         {
-            // Создаем новый StackPanel для каждого игрока
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ StackPanel пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
             var playerPanel = new StackPanel
             {
                 Orientation = Orientation.Horizontal,
                 Spacing = 10
             };
 
-            // Создаем TextBlock с именем игрока
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ TextBlock пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
             var playerInfoText = new TextBlock
             {
                 Text = playerName,
@@ -63,23 +75,83 @@ namespace Client.Views
                 FontWeight = FontWeight.Bold
             };
 
-            // Создаем Path для фишки игрока с нужным цветом
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ Path пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
             var playerColorPath = new Path
             {
                 Width = 30,
                 Height = 30,
-                Data = Geometry.Parse("M 12,2 A 10,10 0 1,0 12,22 A 10,10 0 1,0 12,2 Z"), // Пример SVG
-                Fill = new SolidColorBrush(Avalonia.Media.Color.Parse(color)),// Используем Avalonia.Media.Color.Parse
-                Stroke = Brushes.Black, // Черная обводка
-                StrokeThickness = 1 // Толщина обводки 1 пиксель
+                Data = Geometry.Parse("M 12,2 A 10,10 0 1,0 12,22 A 10,10 0 1,0 12,2 Z"), // пїЅпїЅпїЅпїЅпїЅпїЅ SVG
+                Fill = new SolidColorBrush(Avalonia.Media.Color.Parse(color)),// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Avalonia.Media.Color.Parse
+                Stroke = Brushes.Black, // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+                StrokeThickness = 1 // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1 пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             };
 
-            // Добавляем текст и фишку в StackPanel игрока
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ StackPanel пїЅпїЅпїЅпїЅпїЅпїЅ
             playerPanel.Children.Add(playerColorPath);
             playerPanel.Children.Add(playerInfoText);
 
-            // Добавляем созданный элемент в PlayersListPanel
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ PlayersListPanel
             PlayersListPanel.Children.Add(playerPanel);
+        }
+        
+        // Р»РѕРіРёРєР° РєСѓР±РёРєРєР°
+        protected override void OnOpened(EventArgs e)
+        {
+            base.OnOpened(e);
+
+            _imageView = this.FindControl<Image>("ImageView");
+            _toggleButton = this.FindControl<Button>("ToggleButton");
+
+            if (_imageView is null || _toggleButton is null)
+            {
+                Console.WriteLine("РћС€РёР±РєР°: РќРµ СѓРґР°Р»РѕСЃСЊ РЅР°Р№С‚Рё СЌР»РµРјРµРЅС‚С‹ СѓРїСЂР°РІР»РµРЅРёСЏ!");
+                return;
+            }
+
+            string imageFolder = "Assets/Images/cube";
+
+            // РўРµРїРµСЂСЊ РјРѕР¶РЅРѕ РїСЂРёСЃРІРѕРёС‚СЊ Р·РЅР°С‡РµРЅРёРµ Р±РµР· РѕС€РёР±РєРё
+            _imagePaths = Directory.Exists(imageFolder)
+                ? Directory.GetFiles(imageFolder, "*.png").ToList()
+                : new List<string>();
+
+            if (_imagePaths.Count == 0)
+            {
+                Console.WriteLine("РћС€РёР±РєР°: РќРµС‚ РёР·РѕР±СЂР°Р¶РµРЅРёР№ РІ РїР°РїРєРµ Images.");
+                _toggleButton.IsEnabled = false;
+                return;
+            }
+
+            _toggleButton.Click += ToggleImageChanging;
+        }
+
+        private void ToggleImageChanging(object? sender, EventArgs e)
+        {
+            if (_imageView is null) return;
+
+            if (_isRunning)
+            {
+                _timer?.Stop();
+                _isRunning = false;
+            }
+            else
+            {
+                _timer = new DispatcherTimer
+                {
+                    Interval = TimeSpan.FromSeconds(0.08)
+                };
+                _timer.Tick += (s, args) => ChangeImage();
+                _timer.Start();
+                _isRunning = true;
+            }
+        }
+
+        private void ChangeImage()
+        {
+            if (_imageView is null || _imagePaths.Count == 0) return;
+
+            string randomImage = _imagePaths[_random.Next(_imagePaths.Count)];
+            _imageView.Source = new Bitmap(randomImage);
         }
 
         //private Button? _button;
