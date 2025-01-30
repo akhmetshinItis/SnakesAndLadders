@@ -41,14 +41,14 @@
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
                 <Button x:Name="RedButton" Background="Transparent" BorderBrush="Transparent" Tag="Red"
-                        Click="TestCaller">
+                        Click="OnColorSelected">
                     <Path Width="30" Height="80" Fill="Red" Stroke="Black" StrokeThickness="1.5"
                           Data="M 15,5 C 22,5 25,12 25,20 C 25,25 22,30 18,34 
                     C 28,45 30,65 27,80 L 3,80 C 0,65 2,45 12,34 
                     C 8,30 5,25 5,20 C 5,12 8,5 15,5 Z"/>
                 </Button>
                 <Button x:Name="GreenButton" Background="Transparent" BorderBrush="Transparent" Tag="Green"
-                        Click="TestCaller2">
+                        Click="OnColorSelected">
                     <Path Width="30" Height="80" Fill="Green" Stroke="Black" StrokeThickness="1.5"
                           Data="M 15,5 C 22,5 25,12 25,20 C 25,25 22,30 18,34 
                     C 28,45 30,65 27,80 L 3,80 C 0,65 2,45 12,34 

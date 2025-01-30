@@ -72,7 +72,6 @@ namespace Client.Views
         {
             await PacketProcessor.ConnectAndSendHandshakeAsync();
         }
-
         // TEST
         
         // Сброс границ у всех кнопок
