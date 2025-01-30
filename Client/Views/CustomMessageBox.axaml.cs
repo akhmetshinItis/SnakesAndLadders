@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Client.Network;
 
 namespace Client.Views
 {
@@ -48,6 +50,28 @@ namespace Client.Views
             }
         }
 
+        // TEST
+        private async void TestCaller(object sender, RoutedEventArgs e)
+        {
+            await Test();
+        }
+        
+        private async Task Test()
+        {
+            await PacketProcessor.ConnectAndSendHandshakeAsync();
+        }
+
+        private async void TestCaller2(object sender, RoutedEventArgs e)
+        {
+            await Test2();
+        }
+
+        private async Task Test2()
+        {
+            await PacketProcessor.ConnectAndSendHandshakeAsync();
+        }
+        // TEST
+        
         private void ResetButtonBorders()
         {
             var buttons = new[] { RedButton, GreenButton, YellowButton, BlueButton };

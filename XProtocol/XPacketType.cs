@@ -4,6 +4,8 @@
     {
         Unknown,
         Handshake,
-        NewPlayer
+        NewPlayer,
+        PlayersInfo,
+        RequestPlayerInfo,
     }
 }
