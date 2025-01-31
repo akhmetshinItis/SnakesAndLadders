@@ -6,7 +6,6 @@ using Avalonia;
 using Avalonia.Threading;
 using Client.Enums;
 using Client.Views;
-using TCPClient;
 using XProtocol;
 using XProtocol.Serializator;
 
@@ -42,9 +41,6 @@ namespace Client.Network ;
                     break;
                 case XPacketType.Handshake:
                     ProcessHandshake(packet);
-                    break;
-                case XPacketType.PlayersInfo:
-                    ProcessPlayersInfo(packet);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -86,11 +82,11 @@ namespace Client.Network ;
             var player = XPacketConverter.Deserialize<XPacketPlayer>(packet);
             Console.WriteLine(player.Name);
             Console.WriteLine(player.Color);
+            Client.AvailibleColors[player.Color] = 0;
             Dispatcher.UIThread.InvokeAsync(() =>
             {
                 MainWindow.AddPlayerInfo(player.Name, Colors.GetColor(player.Color));
             });
-            
         }
         
         // TODO: обработка на клиенте случая когда хэндшейк не прошел 
@@ -106,23 +102,6 @@ namespace Client.Network ;
             else
             {
                 Console.WriteLine("Handshake failed!");
-            }
-        }
-
-        private static void ProcessPlayersInfo(XPacket packet)
-        {
-            var packetInfo = XPacketConverter.Deserialize<XPacketPlayerInfo>(packet);
-            var players = JsonSerializer.Deserialize<List<string>>(packetInfo.InformationJson);
-            foreach (var player in players!)
-            {
-                if(player == Client.Name)
-                    continue;
-                Console.WriteLine(player);
-                int x = 1;
-                Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                   MainWindow.AddPlayerInfo(player, Colors.GetColor(x));
-                });
             }
         }
     }

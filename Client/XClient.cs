@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TCPClient
+namespace Client
 {
     public class XClient
     {
+        // TODO: Не забыть обновлять цвета когда пользователь вышел
+        public int[] AvailibleColors = {0, 1, 2, 3, 4}; // хехе костыль чтобы за индексами не следить
         public string? Name { get; set; }
         
         // Послание Тимерхану Аглямовичу от Тагира

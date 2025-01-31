@@ -114,11 +114,7 @@ namespace TCPServer
         private async Task ProcessRequestPlayerInfo(XPacket packet)
         {
             Console.WriteLine("Recieved request player info packet.");
-            await Server.SendAllClientsToCaller(this);
-            // var names = Server.GetClientsNames();
-            // var serialized = JsonSerializer.Serialize(names);
-            // var pack = XPacketConverter.Serialize(XPacketType.PlayersInfo, new XPacketPlayerInfo{InformationJson = serialized});
-            // QueuePacketSend(pack.ToPacket()); 
+            await Server.SendAllClientsToCaller(this, false);
         }
 
         public void QueuePacketSend(byte[] packet)

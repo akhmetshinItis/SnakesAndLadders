@@ -82,11 +82,11 @@ namespace TCPServer
             }
         }
 
-        public async Task SendAllClientsToCaller(ConnectedClient callingClient)
+        public async Task SendAllClientsToCaller(ConnectedClient callingClient, bool skipCaller = true)
         {
             foreach (var client in  _clients)
             {
-                if (client == callingClient)
+                if (client == callingClient && skipCaller)
                     continue;
                 var pack = XPacketConverter.Serialize(XPacketType.NewPlayer,
                     new XPacketPlayer

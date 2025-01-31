@@ -19,12 +19,19 @@ namespace Client.Views
         private bool _isRunning = false;
         private Image? _imageView;
         private Button? _toggleButton;
-
+        public AlertMessageBox AlertMessage { get; set; }
         public MainWindow()
         {
             InitializeComponent();
             this.Show(); // ������� ���������� ������� ����
             ShowCustomMessageBox(); // ����� ��������� ���� ��� ����� �����
+            ShowAlertWindow();
+        }
+
+        // Надо понять почему не работает, пока что он будет просто не давать продолжить если цвет занят
+        private async void ShowAlertWindow()
+        {
+            AlertMessage = new AlertMessageBox();
         }
 
         private async void ShowCustomMessageBox()
@@ -33,7 +40,6 @@ namespace Client.Views
             //await messageBox.ShowDialog(this);
             var customMessageBox = new CustomMessageBox(this);  // �������� ������� MainWindow
             await customMessageBox.ShowDialog(this);  // ���������� ����
-
         }
 
         // ����� ��� ���������� ������ � ��� ����� � ������

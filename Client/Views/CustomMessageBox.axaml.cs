@@ -51,28 +51,6 @@ namespace Client.Views
                 }
             }
         }
-
-        // TEST
-        private async void TestCaller(object sender, RoutedEventArgs e)
-        {
-            await Test();
-        }
-        
-        private async Task Test()
-        {
-            await PacketProcessor.ConnectAndSendHandshakeAsync();
-        }
-
-        private async void TestCaller2(object sender, RoutedEventArgs e)
-        {
-            await Test2();
-        }
-
-        private async Task Test2()
-        {
-            await PacketProcessor.ConnectAndSendHandshakeAsync();
-        }
-        // TEST
         
         private void ResetButtonBorders()
         {
@@ -94,7 +72,7 @@ namespace Client.Views
 
             if (!string.IsNullOrWhiteSpace(_playerName) && _selectedColor != "None")
             {
-                _mainWindow.AddPlayerInfo(_playerName, _selectedColor);
+                // _mainWindow.AddPlayerInfo(_playerName, _selectedColor);
                 
                 try
                 {
@@ -106,9 +84,10 @@ namespace Client.Views
                 }
                 
                 PacketProcessor.MainWindow = _mainWindow;
-                await Task.Delay(100); // Ждем немного перед отправкой
-                await PacketSender.SendNewPlayerPacket(_playerName, Colors.GetColorId(_selectedColor)); // Теперь await
                 await Task.Delay(100);
+                await PacketSender.SendNewPlayerPacket(_playerName, Colors.GetColorId(_selectedColor));
+                await Task.Delay(100);
+                // при такой реализации не будет работать проверка на цвет для второго юзера хз что делать с этим пока что
                 await PacketSender.SendPlayersInfoRequest();
                 Close();
             }
