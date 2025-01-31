@@ -15,10 +15,43 @@
 		
 		<!-- Игровое поле -->
 		<Image Source="/Assets/Images/board.png"
-               Stretch="Uniform"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Center"
-               Margin="0,50,0,50" />
+		       Stretch="Uniform"
+		       HorizontalAlignment="Center"
+		       VerticalAlignment="Center"
+		       Margin="0,50,0,50"
+		       Width="500" 
+		       Height="500" 
+		/>
+		
+		<!-- Основа для фишек -->
+		<Grid x:Name="GameGrid"
+		      Width="450" Height="450"
+		      HorizontalAlignment="Center"
+		      VerticalAlignment="Center"
+		      Background="Transparent"
+		      Margin="0,50,0,50">
+
+			<Canvas x:Name="TokenLayer" Width="450" Height="480">
+			</Canvas>
+		</Grid>
+		
+		<!-- Кубик -->
+		<StackPanel HorizontalAlignment="Right"
+		            VerticalAlignment="Bottom"
+		            Margin="150,0,20,50"
+		            Spacing="10">
+			<Image x:Name="ImageView" Width="100" Height="100" Stretch="Uniform"/>
+			<Button x:Name="RollDiceButton" Content="Бросить кубик" Width="120" Height="40"/>
+		</StackPanel>
+		
+		<!-- ~1~ Кубик @1@ -->
+		<!-- <StackPanel HorizontalAlignment="Right" -->
+		<!--             VerticalAlignment="Bottom" -->
+		<!--             Margin="150,0,20,50" -->
+		<!--             Spacing="10"> -->
+		<!-- 	<Image x:Name="ImageView" Width="100" Height="100" Stretch="Uniform"/> -->
+		<!-- 	<Button x:Name="ToggleButton" Content="Старт / Стоп" Width="120" Height="40"/> -->
+		<!-- </StackPanel> -->
 
 		<!-- Лист для отображения имен игроков и их фишек -->
 		<StackPanel x:Name="PlayersListPanel"
@@ -43,16 +76,6 @@
 		<Canvas x:Name="MainGrid"
 				HorizontalAlignment="Stretch"
 				VerticalAlignment="Stretch"/>
-
-
-		<!-- Кубик -->
-		<StackPanel HorizontalAlignment="Right"
-		            VerticalAlignment="Bottom"
-		            Margin="150,0,20,50"
-		            Spacing="10">
-			<Image x:Name="ImageView" Width="100" Height="100" Stretch="Uniform"/>
-			<Button x:Name="ToggleButton" Content="Старт / Стоп" Width="120" Height="40"/>
-		</StackPanel>
 		
 		<!-- Ваши другие элементы UI, например, кнопки или фишки -->
 		
