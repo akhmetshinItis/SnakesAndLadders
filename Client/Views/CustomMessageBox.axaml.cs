@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -7,6 +8,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Client.Network;
+using Colors = Client.Enums.Colors;
 
 namespace Client.Views
 {
@@ -27,7 +29,7 @@ namespace Client.Views
             _mainWindow = mainWindow;  // Сохраняем ссылку на главное окно
             InitializeComponent();
         }
-
+        
         private void OnColorSelected(object sender, RoutedEventArgs e)
         {
             if (sender is Button clickedButton)
@@ -49,28 +51,6 @@ namespace Client.Views
                 }
             }
         }
-
-        // TEST
-        private async void TestCaller(object sender, RoutedEventArgs e)
-        {
-            await Test();
-        }
-        
-        private async Task Test()
-        {
-            await PacketProcessor.ConnectAndSendHandshakeAsync();
-        }
-
-        private async void TestCaller2(object sender, RoutedEventArgs e)
-        {
-            await Test2();
-        }
-
-        private async Task Test2()
-        {
-            await PacketProcessor.ConnectAndSendHandshakeAsync();
-        }
-        // TEST
         
         private void ResetButtonBorders()
         {
@@ -85,25 +65,33 @@ namespace Client.Views
                 }
             }
         }
-
-        //private void OnOkButtonClick(object sender, RoutedEventArgs e)
-        //{
-        //    Console.WriteLine($"Выбранный цвет: {_selectedColor} перед закрытием");
-        //    Close();
-        //}
-        private void OnOkButtonClick(object sender, RoutedEventArgs e)
+        
+        private async void OnOkButtonClick(object sender, RoutedEventArgs e)
         {
             _playerName = UserInputTextBox.Text; // Получаем имя игрока из текстового поля
 
             if (!string.IsNullOrWhiteSpace(_playerName) && _selectedColor != "None")
             {
-                // Добавляем информацию о игроке в список
-                _mainWindow.AddPlayerInfo(_playerName, _selectedColor);
-
-                // Закрыть окно после нажатия "OK"
+                // _mainWindow.AddPlayerInfo(_playerName, _selectedColor);
+                
+                try
+                {
+                    await PacketProcessor.ConnectAndSendHandshakeAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Подключение не удалось: " + ex.Message);
+                }
+                
+                PacketProcessor.MainWindow = _mainWindow;
+                await Task.Delay(100);
+                await PacketSender.SendNewPlayerPacket(_playerName, Colors.GetColorId(_selectedColor));
+                await Task.Delay(100);
+                // при такой реализации не будет работать проверка на цвет для второго юзера хз что делать с этим пока что
+                await PacketSender.SendPlayersInfoRequest();
                 Close();
             }
-
+        }
         }
     }
-}
+

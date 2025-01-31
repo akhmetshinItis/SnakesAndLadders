@@ -1,20 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TCPClient
+namespace Client
 {
     public class XClient
     {
-        // TODO: добавить идентификатор
+        // TODO: Не забыть обновлять цвета когда пользователь вышел
+        public int[] AvailibleColors = {0, 1, 2, 3, 4}; // хехе костыль чтобы за индексами не следить
+        public string? Name { get; set; }
+        
+        // Послание Тимерхану Аглямовичу от Тагира
+        
+        /// <summary>
+        /// ЧЕСТНО СКАЖУ С ГПТ ВЗЯЛ, после того как у меня утекло 50гб памяти
+        /// понятия не имею зачем тут какой-то конкурент кью
+        /// </summary>
+        private readonly ConcurrentQueue<byte[]> _packetSendingQueue = new ConcurrentQueue<byte[]>();
+        
+        /// <summary>
+        /// Это тоже не знаю зачем, разберусь с этим всем обязательно, когда время будет,
+        /// пока на результат работаем, а не на качество
+        /// ну и надеюсь что мне ближайшее время не пригодится такими вещами пользоваться
+        /// </summary>
+        private readonly ManualResetEventSlim _packetAvailable = new ManualResetEventSlim(false);
         public Action<byte[]> OnPacketRecieve { get; set; }
-
-        private readonly Queue<byte[]> _packetSendingQueue = new Queue<byte[]>();
-
+        
         private Socket _socket;
         private IPEndPoint _serverEndPoint;
 
@@ -41,43 +56,84 @@ namespace TCPClient
         {
             if (packet.Length > 256)
             {
-                throw new Exception("Max packet size is 256 bytes.");
+                throw new Exception("Максимальный размер пакета – 256 байт.");
             }
 
             _packetSendingQueue.Enqueue(packet);
+            _packetAvailable.Set(); // Уведомляем поток, что есть новый пакет
         }
 
         private void RecievePackets()
         {
-            while (true)
+            try
             {
-                var buff = new byte[256];
-                _socket.Receive(buff);
-
-                buff = buff.TakeWhile((b, i) =>
+                while (_socket.Connected) // Проверяем, подключен ли сокет
                 {
-                    if (b != 0xFF) return true;
-                    return buff[i + 1] != 0;
-                }).Concat(new byte[] {0xFF, 0}).ToArray();
+                    var buff = new byte[256];
+                    int received = _socket.Receive(buff);
 
-                OnPacketRecieve?.Invoke(buff);
+                    if (received == 0) // Если сокет закрылся — выходим из цикла
+                    {
+                        Console.WriteLine("Socket closed by remote host.");
+                        break;
+                    }
+
+                    // Обрезаем данные, оставляя только полученные байты
+                    var packet = buff.Take(received).ToArray();
+
+                    // Фильтруем пакет, обрезая лишние данные
+                    packet = FilterPacket(packet);
+
+                    // Вызываем событие
+                    OnPacketRecieve?.Invoke(packet);
+                }
+            }
+            catch (SocketException ex)
+            {
+                Console.WriteLine($"Socket error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected error: {ex.Message}");
+            }
+            finally
+            {
+                Console.WriteLine("Stopping packet receiving...");
+                _socket.Close();
             }
         }
 
+        /// <summary>
+        /// Фильтрует пакет, удаляя ненужные байты.
+        /// </summary>
+        private byte[] FilterPacket(byte[] packet)
+        {
+            return packet.TakeWhile((b, i) =>
+            {
+                if (b != 0xFF) return true;
+                return i + 1 < packet.Length && packet[i + 1] != 0;
+            }).Concat(new byte[] { 0xFF, 0 }).ToArray();
+        }
+        
         private void SendPackets()
         {
-            while (true)
+            while (_socket.Connected)
             {
-                if (_packetSendingQueue.Count == 0)
+                _packetAvailable.Wait(); // Ждем появления пакетов в очереди
+                _packetAvailable.Reset(); // Сбрасываем ожидание
+
+                while (_packetSendingQueue.TryDequeue(out var packet)) // Забираем пакет
                 {
-                    Thread.Sleep(100);
-                    continue;
+                    try
+                    {
+                        _socket.Send(packet);
+                    }
+                    catch (SocketException ex)
+                    {
+                        Console.WriteLine($"Ошибка отправки пакета: {ex.Message}");
+                        return;
+                    }
                 }
-
-                var packet = _packetSendingQueue.Dequeue();
-                _socket.Send(packet);
-
-                Thread.Sleep(100);
             }
         }
     }

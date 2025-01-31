@@ -13,7 +13,6 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Client.Views;
-using TCPClient;
 using XProtocol;
 using XProtocol.Serializator;
 using static System.Net.WebRequestMethods;
@@ -37,6 +36,8 @@ namespace Client.Views
         private const int _cellSize = 45; // Размер клетки 
         
         
+        private Button? _toggleButton;
+        public AlertMessageBox AlertMessage { get; set; }
         public MainWindow()
         {
             InitializeComponent();
@@ -55,15 +56,22 @@ namespace Client.Views
             UpdateTokenPosition(-1);
             
             
+            ShowAlertWindow();
+        }
+
+        // Надо понять почему не работает, пока что он будет просто не давать продолжить если цвет занят
+        private async void ShowAlertWindow()
+        {
+            AlertMessage = new AlertMessageBox();
         }
         
+
         private async void ShowCustomMessageBox()
         {
             //var messageBox = new CustomMessageBox();
             //await messageBox.ShowDialog(this);
             var customMessageBox = new CustomMessageBox(this);  // �������� ������� MainWindow
-            customMessageBox.ShowDialog(this);  // ���������� ����
-
+            await customMessageBox.ShowDialog(this);  // ���������� ����
         }
         
         private void RollDice_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -349,38 +357,5 @@ namespace Client.Views
             string randomImage = _imagePaths[_random_img.Next(_imagePaths.Count)];
             _imageView.Source = new Bitmap(randomImage);
         }
-
-        //private Button? _button;
-        //private TextBox _textBox;
-
-        //public MainWindow()
-        //{
-        //    InitializeComponent();
-        //    _button = this.FindControl<Button>("Button");
-        //    _textBox = this.FindControl<TextBox>("TextBox");
-        //    _button.Click += OnClick;
-        //}
-
-        //private async void OnClick(object? sender, RoutedEventArgs e)
-        //{
-        //    _button.IsEnabled = false;
-        //    Console.WriteLine(1);
-        //    try
-        //    {
-        //        await ConnectAndSendAsync();
-        //    }
-        //    finally
-        //    {
-        //        _button.IsEnabled = true;
-        //    }
-
-        //    Console.WriteLine(2);
-        //}
-
-        //private async void OnClick2(object? sender, RoutedEventArgs e)
-        //{
-        //    Console.WriteLine("OnClick2");
-        //}
-        
     }
 }

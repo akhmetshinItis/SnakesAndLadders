@@ -33,4 +33,10 @@
     <ItemGroup>
       <Folder Include="Assets\Images\" />
     </ItemGroup>
+    <ItemGroup>
+      <Compile Update="Views\AlertMessageBox.axaml.cs">
+        <DependentUpon>AlertMessageBox.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
 </Project>

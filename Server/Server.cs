@@ -82,9 +82,26 @@ namespace TCPServer
             }
         }
 
-        public string GetClientsNames()
+        public async Task SendAllClientsToCaller(ConnectedClient callingClient, bool skipCaller = true)
         {
-            return JsonSerializer.Serialize(_clients.Select(c => c.Name).ToList());
+            foreach (var client in  _clients)
+            {
+                if (client == callingClient && skipCaller)
+                    continue;
+                var pack = XPacketConverter.Serialize(XPacketType.NewPlayer,
+                    new XPacketPlayer
+                    {
+                        Name = client.Name,
+                        Color = client.Color,
+                    });
+                callingClient.QueuePacketSend(pack.ToPacket());
+                await Task.Delay(100);
+            }
+        }
+
+        public List<string> GetClientsNames()
+        {
+            return _clients.Select(c => c.Name).ToList();
         }
 
         public async Task CheckClients()
@@ -106,7 +123,6 @@ namespace TCPServer
             }
         }
         
-        // переделать надо на отправку пакета какого нибудь хотя хз
         private bool IsClientConnected(Socket socket)
         {
             try
