@@ -12,7 +12,7 @@ namespace TCPServer
     internal class Server
     {
         private readonly Socket _socket;
-        private readonly List<ConnectedClient> _clients;
+        public List<ConnectedClient> _clients;
 
         private bool _listening;
         private bool _stopListening;
@@ -71,14 +71,15 @@ namespace TCPServer
             }
         }
 
-        public void SendToClients(ConnectedClient callingClient, XPacket packet)
+        public void SendToClients(ConnectedClient? callingClient, XPacket packet, bool skipCaller = true)
         {
             foreach (var client in _clients)
             {
-                if (client != callingClient)
-                {
-                    client.QueuePacketSend(packet.ToPacket());
-                }
+                if (callingClient != null && client == callingClient && skipCaller)
+                    continue;
+                
+                client.QueuePacketSend(packet.ToPacket());
+                
             }
         }
 
@@ -116,6 +117,13 @@ namespace TCPServer
                     {
                         Console.WriteLine($"[-] Клиент {client.Name} отключен.");
                         _clients.RemoveAt(i);
+
+                        var pack = XPacketConverter.Serialize(XPacketType.DisconnectPlayer, new XPacketPlayer
+                        {
+                            Name = client.Name,
+                            Color = client.Color,
+                        });
+                        SendToClients(client, pack, false);
                     }
                 }
 
@@ -134,7 +142,5 @@ namespace TCPServer
                 return false;
             }
         }
-
-        
     }
 }

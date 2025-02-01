@@ -23,6 +23,8 @@ namespace Client.Network ;
             if (Client.AvailibleColors[playerColor] == 0)
             {
                 Console.WriteLine("Цвет занят");
+                // await MainWindow.CustomMessageBox.ShowDialog(MainWindow);
+                MainWindow.CustomMessageBox.UserInputTextBox.Watermark = "ЦВЕТ ИЛИ ИМЯ УЖЕ ЗАНЯТЫ";
                 return;
             }
             

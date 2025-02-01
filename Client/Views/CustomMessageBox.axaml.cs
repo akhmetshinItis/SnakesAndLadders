@@ -17,6 +17,7 @@ namespace Client.Views
         private string _selectedColor = "None"; // Хранит выбранный цвет
         private string _playerName = ""; // Хранит имя игрока
         private readonly MainWindow _mainWindow;
+        private bool _isProcessing = false;
 
 
 
@@ -68,12 +69,15 @@ namespace Client.Views
         
         private async void OnOkButtonClick(object sender, RoutedEventArgs e)
         {
+            if(_isProcessing) return;
+            _isProcessing = true;
+            Ok.IsEnabled = false;
             _playerName = UserInputTextBox.Text; // Получаем имя игрока из текстового поля
-
+            MainWindow.PlayerName = _playerName;
             if (!string.IsNullOrWhiteSpace(_playerName) && _selectedColor != "None")
             {
                 // _mainWindow.AddPlayerInfo(_playerName, _selectedColor);
-                
+
                 try
                 {
                     await PacketProcessor.ConnectAndSendHandshakeAsync();
@@ -82,14 +86,27 @@ namespace Client.Views
                 {
                     Console.WriteLine("Подключение не удалось: " + ex.Message);
                 }
+                finally
+                {
+                    Ok.IsEnabled = true;
+                }
                 
                 PacketProcessor.MainWindow = _mainWindow;
+                PacketProcessor.CustomMessageBox = this;
                 await Task.Delay(100);
                 await PacketSender.SendNewPlayerPacket(_playerName, Colors.GetColorId(_selectedColor));
                 await Task.Delay(100);
-                // при такой реализации не будет работать проверка на цвет для второго юзера хз что делать с этим пока что
-                await PacketSender.SendPlayersInfoRequest();
-                Close();
+                if (PacketProcessor.CorrectInf)
+                {
+                    // при такой реализации не будет работать проверка на цвет для второго юзера хз что делать с этим пока что
+                    await PacketSender.SendPlayersInfoRequest();
+                    await Task.Delay(100);
+                    Close();
+                }
+                PacketProcessor.CorrectInf = true;
+                Notification.IsVisible = true;
+                Ok.IsEnabled = true;
+                _isProcessing = false;
             }
         }
         }

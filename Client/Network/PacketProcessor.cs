@@ -14,9 +14,11 @@ namespace Client.Network ;
     public class PacketProcessor
     {
         public static MainWindow? MainWindow { get; set; }
+        public static CustomMessageBox? CustomMessageBox { get; set; }
         private static TaskCompletionSource<bool> _handshakeCompletionSource;
         internal static XClient? Client { get; set; }
         private static int _handshakeMagic;
+        public static bool CorrectInf = true;
 
         private static void OnPacketRecieve(byte[] packet)
         {
@@ -41,6 +43,12 @@ namespace Client.Network ;
                     break;
                 case XPacketType.Handshake:
                     ProcessHandshake(packet);
+                    break;
+                case XPacketType.DisconnectPlayer:
+                    ProcessDisconnectPlayer(packet);
+                    break;
+                case XPacketType.PlayerInfoNotAvailable:
+                    ProcessPlayerInfoNotAvailable(packet);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -83,9 +91,10 @@ namespace Client.Network ;
             Console.WriteLine(player.Name);
             Console.WriteLine(player.Color);
             Client.AvailibleColors[player.Color] = 0;
+            bool flag = player.Name.Equals(Client.Name);
             Dispatcher.UIThread.InvokeAsync(() =>
             {
-                MainWindow.AddPlayerInfo(player.Name, Colors.GetColor(player.Color));
+                MainWindow.AddPlayerInfo(player.Name, Colors.GetColor(player.Color), flag);
             });
         }
         
@@ -103,5 +112,19 @@ namespace Client.Network ;
             {
                 Console.WriteLine("Handshake failed!");
             }
+        }
+
+        private static void ProcessDisconnectPlayer(XPacket packet)
+        {
+            var player = XPacketConverter.Deserialize<XPacketPlayer>(packet);
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                MainWindow.DeletePlayer(player.Name, color: Colors.GetColor(player.Color));
+            });
+        }
+
+        private static void ProcessPlayerInfoNotAvailable(XPacket packet)
+        {
+            CorrectInf = false;
         }
     }
