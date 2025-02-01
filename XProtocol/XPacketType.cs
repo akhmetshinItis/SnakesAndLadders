@@ -9,5 +9,7 @@
         RequestPlayerInfo,
         DisconnectPlayer,
         PlayerInfoNotAvailable,
+        RollDice,
+        ChangeTurn,
     }
 }

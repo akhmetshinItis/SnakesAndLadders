@@ -8,8 +8,9 @@ namespace TCPServer
     internal class ConnectedClient
     {
         public string Name { get; set; }
-        
+        public bool IsFirst { get; set; } = false;
         public int Color { get; set; }
+        public int Position { get; set; }
         public Server Server { get; set; }
         public Socket Client { get; }
         public bool IsConnected => Client != null && Client.Connected;
@@ -81,6 +82,9 @@ namespace TCPServer
                 case XPacketType.RequestPlayerInfo:
                     ProcessRequestPlayerInfo(packet);
                     break;
+                case XPacketType.RollDice:
+                    ProcessRollDice(packet);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -98,7 +102,7 @@ namespace TCPServer
             QueuePacketSend(XPacketConverter.Serialize(XPacketType.Handshake, handshake).ToPacket());
         }
 
-        private void ProcessNewPlayer(XPacket packet)
+        private async Task ProcessNewPlayer(XPacket packet)
         {
             Console.WriteLine("Recieved new player packet.");
             var player = XPacketConverter.Deserialize<XPacketPlayer>(packet);
@@ -111,11 +115,16 @@ namespace TCPServer
                 Server._clients.RemoveAt(Server._clients.Count - 1);
                 return;
             }
+            if (IsFirst)
+            {
+                var pack = XPacket.Create(XPacketType.ChangeTurn);
+                QueuePacketSend(pack.ToPacket());
+            }
             Storage.AvalibleColors[player.Color] = 0;
             Storage.Names.Add(player.Name);
             Name = player.Name;
             Color = player.Color;
-            
+            await Task.Delay(50);
             // QueuePacketSend(XPacketConverter.Serialize(XPacketType.NewPlayer, player).ToPacket());
             Server.SendToClients(this, XPacketConverter.Serialize(XPacketType.NewPlayer, player));
         }
@@ -125,6 +134,15 @@ namespace TCPServer
             Console.WriteLine("Recieved request player info packet.");
             await Server.SendAllClientsToCaller(this, false);
         }
+
+        private async Task ProcessRollDice(XPacket packet)
+        {
+            Console.WriteLine("Recieved roll dice packet.");
+            await Server.SendToClients(this, packet, true);
+            await Task.Delay(100);
+            await Server.ChangeTurn(this);
+        }
+        
 
         public void QueuePacketSend(byte[] packet)
         {

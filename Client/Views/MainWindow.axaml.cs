@@ -13,6 +13,8 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
+using Client.Enums;
+using Client.Network;
 using Client.Views;
 using XProtocol;
 using XProtocol.Serializator;
@@ -26,21 +28,17 @@ namespace Client.Views
         private List<string> _imagePaths = new(); 
         private readonly Random _random_img = new();
         private DispatcherTimer? _timer_img;
-        private bool _isRunning = false;
+        private bool _isRunning { get; set; }= false;
         private Image? _imageView;
         private Button? _rollDiceButton;
         private readonly Random _random = new();
         private Path? _playerToken;
         private DispatcherTimer? _movementTimer;
-        private int _currentPosition = 0; // Позиция на поле (0 - старт)
+        private int _currentPosition { get; set; } = 0; // Позиция на поле (0 - старт)
         private const int _gridSize = 10; // Размер поля 10x10
         private const int _cellSize = 45; // Размер клетки 
-        private Dictionary<Path, int> _tokenPositions = new(); // Словарь: фишка → её текущая позиция
-        private Dictionary<string, Path> _playerTokens = new();  // Словарь: имя игрока → его фишка
-        public static string PlayerName { get; set; }
         public static CustomMessageBox CustomMessageBox { get; set; }
         private Button? _toggleButton;
-        public AlertMessageBox AlertMessage { get; set; }
         public MainWindow()
         {
             InitializeComponent();
@@ -54,14 +52,6 @@ namespace Client.Views
 
             // if (_rollDiceButton != null)
             //     _rollDiceButton.Click += RollDice_Click;
-            
-            ShowAlertWindow();
-        }
-
-        // Надо понять почему не работает, пока что он будет просто не давать продолжить если цвет занят
-        private async void ShowAlertWindow()
-        {
-            AlertMessage = new AlertMessageBox();
         }
         
 
@@ -92,17 +82,6 @@ namespace Client.Views
         // Это нужно чтобы учитывать змеи/лестницы (сначала надо починить, чтобы фишка ходила ровно, а не как АЛКОГОЛИК
         
         
-        // private readonly Dictionary<int, int> _snakesAndLadders = new()
-        // {
-        //     { 3, 22 }, // Лестница: с клетки 3 на 22
-        //     { 5, 8 },  // Лестница: с 5 на 8
-        //     { 11, 26 }, // Лестница: с 11 на 26
-        //     { 20, 29 }, // Лестница: с 20 на 29
-        //     { 17, 4 },  // Змея: с 17 на 4
-        //     { 19, 7 },  // Змея: с 19 на 7
-        //     { 27, 1 },  // Змея: с 27 на 1
-        //     { 21, 9 }   // Змея: с 21 на 9
-        // };
         
         // private void RollDice_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         // {
@@ -118,21 +97,28 @@ namespace Client.Views
         //         MoveToken(targetPosition, newPosition); // Перемещаем фишку
         //         targetPosition = newPosition; // Обновляем текущую позицию
         //     }
-        //
+        
         //     _currentPosition = targetPosition;
         // }
         
-        private async Task MoveToken(Path token, int start, int end)
+        public async Task MoveToken(Path token, int start, int end)
         {
-            if (token == null || !_tokenPositions.ContainsKey(token)) return;
+            if (token == null || ! Storage.TokenPositions.ContainsKey(token)) return;
 
             int steps = end - start;
 
             for (int i = 0; i < steps; i++)
             {
-                _tokenPositions[token]++;  // Обновляем позицию в словаре
-                await SmoothMoveTo(token, _tokenPositions[token]); // Передаём фишку и новую позицию
+                Storage.TokenPositions[token]++;  // Обновляем позицию в словаре
+                await SmoothMoveTo(token, Storage.TokenPositions[token]); // Передаём фишку и новую позицию
             }
+            
+            //надо разобраться
+            // if (Storage.SnakesAndLadders.ContainsKey(end))
+            // {
+            //     int newPosition = Storage.SnakesAndLadders[end];
+            //     await MoveToken(token,  end,newPosition); // Перемещаем фишку
+            // }
         }
 
 
@@ -175,13 +161,13 @@ namespace Client.Views
             if (token == null) return;
 
             // Обновляем позицию в словаре
-            if (_tokenPositions.ContainsKey(token))
+            if (Storage.TokenPositions.ContainsKey(token))
             {
-                _tokenPositions[token] = position;
+                Storage.TokenPositions[token] = position;
             }
             else
             {
-                _tokenPositions.Add(token, position);
+                Storage.TokenPositions.Add(token, position);
             }
 
             int row = _gridSize - 1 - (position / _gridSize);
@@ -197,40 +183,6 @@ namespace Client.Views
         }
 
         
-        //public void AddPlayerInfo(string playerName, string color)
-        //{
-        //    var playerPanel = new StackPanel
-        //    {
-        //        Orientation = Orientation.Horizontal,
-        //        Spacing = 10
-        //    };
-
-
-        //    var playerInfoText = new TextBlock
-        //    {
-        //        Text = playerName,
-        //        Foreground = Brushes.Black,
-        //        FontSize = 18,
-        //        FontWeight = FontWeight.Bold
-        //    };
-
-
-        //    var playerColorPath = new Path
-        //    {
-        //        Width = 30,
-        //        Height = 30,
-        //        Data = Geometry.Parse("M 12,2 A 10,10 0 1,0 12,22 A 10,10 0 1,0 12,2 Z"),
-        //        Fill = new SolidColorBrush(Avalonia.Media.Color.Parse(color)),
-        //        Stroke = Brushes.Black, 
-        //        StrokeThickness = 1 
-        //    };
-
-        //    playerPanel.Children.Add(playerColorPath);
-        //    playerPanel.Children.Add(playerInfoText);
-
-        //    PlayersListPanel.Children.Add(playerPanel);
-        //}
-
         public void AddPlayerInfo(string playerName, string color, bool isClient = false)
         {
             var playerPanel = new StackPanel
@@ -266,34 +218,7 @@ namespace Client.Views
             AddPlayerToken(playerName, color, isClient);
         }
 
-
-        //    private void AddPlayerToken(string color)
-        //{
-        //    var token = new Path
-        //    {
-        //        Width = 30,
-        //        Height = 80,
-        //        Data = Geometry.Parse(" M 15,5 C 22,5 25,12 25,20 C 25,25 22,30 18,34 C 28,45 30,65 27,80 L 3,80 C 0,65 2,45 12,34 C 8,30 5,25 5,20 C 5,12 8,5 15,5 Z"),
-
-        //        Fill = new SolidColorBrush(Avalonia.Media.Color.Parse(color)),
-        //        Stroke = Brushes.Black,
-        //        StrokeThickness = 1.5
-        //    };
-
-        //    var tokenContainer = new Canvas
-        //    {
-        //        Width = 50,
-        //        Height = 100
-        //    };
-
-        //    tokenContainer.Children.Add(token);
-
-        //    // Устанавливаем позицию фишки внизу слева
-        //    Canvas.SetLeft(tokenContainer, 100); // Отступ слева
-        //    Canvas.SetTop(tokenContainer, MainGrid.Bounds.Height - 100); // Отступ снизу
-
-        //    MainGrid.Children.Add(tokenContainer);
-        //}
+        
         public void AddPlayerToken(string playerName, string color, bool isClient = false)
         {
             var newToken = new Path
@@ -307,13 +232,13 @@ namespace Client.Views
             };
 
             // Если это первая фишка, сохраняем её в _playerToken
-            if (_playerTokens.Count == 0 || isClient)
+            if (Storage.PlayerTokens.Count == 0 || isClient)
             {
                 _playerToken = newToken;
             }
 
-            _playerTokens[playerName] = newToken; // Добавляем фишку в словарь
-            _tokenPositions[newToken] = -1; // Сохраняем начальную позицию фишки
+            Storage.PlayerTokens[playerName] = newToken; // Добавляем фишку в словарь
+            Storage.TokenPositions[newToken] = -1; // Сохраняем начальную позицию фишки
             TokenLayer.Children.Add(newToken); // Добавляем на поле
 
             UpdateTokenPosition(newToken, -1); // Устанавливаем начальную позицию
@@ -350,27 +275,7 @@ namespace Client.Views
 
             _rollDiceButton.Click += ToggleImageChanging;
         }
-
-        // private void ToggleImageChanging(object? sender, EventArgs e)
-        // {
-        //     if (_imageView is null) return;
-        //
-        //     if (_isRunning)
-        //     {
-        //         _timer_img?.Stop();
-        //         _isRunning = false;
-        //     }
-        //     else
-        //     {
-        //         _timer_img = new DispatcherTimer
-        //         {
-        //             Interval = TimeSpan.FromSeconds(0.08)
-        //         };
-        //         _timer_img.Tick += (s, args) => ChangeImage();
-        //         _timer_img.Start();
-        //         _isRunning = true;
-        //     }
-        // }
+        
         
         private async void ToggleImageChanging(object? sender, EventArgs e)
         {
@@ -378,7 +283,6 @@ namespace Client.Views
 
             _rollDiceButton.IsEnabled = false;
 
-            // Если анимация уже идет, остановим её
             if (_isRunning)
             {
                 _timer_img?.Stop();
@@ -386,13 +290,12 @@ namespace Client.Views
                 return;
             }
 
-            // Начинаем анимацию
             _timer_img = new DispatcherTimer
             {
                 Interval = TimeSpan.FromSeconds(0.1) // Промежуток между изменениями изображений
             };
     
-            _timer_img.Tick += (s, args) => ChangeImage(); // Меняем изображение каждый тик
+            _timer_img.Tick += (s, args) => ChangeImage();
             _timer_img.Start();
 
             _isRunning = true;
@@ -405,10 +308,10 @@ namespace Client.Views
             // Определяем результат по последнему изображению
             string lastImage = _imagePaths[_random_img.Next(_imagePaths.Count)];
             _imageView.Source = new Bitmap(lastImage);
-            var score = GetDiceResultFromImage(lastImage);
+            var score = Int32.Parse(GetDiceResultFromImage(lastImage));
             Console.WriteLine($"Анимация завершена! Результат: {score}");
-            await RollDice(Int32.Parse(score));
-            _rollDiceButton.IsEnabled = true;
+            await PacketSender.SendRollDice(Storage.Name, score);
+            await RollDice((score));
         }
 
         private void ChangeImage()

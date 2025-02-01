@@ -41,7 +41,8 @@
 		            Margin="150,0,20,50"
 		            Spacing="10">
 			<Image x:Name="ImageView" Width="100" Height="100" Stretch="Uniform"/>
-			<Button x:Name="RollDiceButton" Content="Бросить кубик" Width="120" Height="40"/>
+			<!-- Если не будет работать обратите внимание! Сделал бросок только по очередеи изменить на IsEnabled -->
+			<Button x:Name="RollDiceButton" Content="Бросить кубик" Width="120" Height="40" IsEnabled="False"/>
 		</StackPanel>
 		
 		<!-- ~1~ Кубик @1@ -->
