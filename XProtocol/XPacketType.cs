@@ -7,5 +7,7 @@
         NewPlayer,
         PlayersInfo,
         RequestPlayerInfo,
+        DisconnectPlayer,
+        PlayerInfoNotAvailable,
     }
 }

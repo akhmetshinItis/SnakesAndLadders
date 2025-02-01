@@ -59,7 +59,6 @@
                     VerticalAlignment="Top"
                     Margin="50,50,0,0"
                     Spacing="10"
-                    Background="LightSkyBlue"
 					MinHeight="200"
 					MinWidth="200">
 			<StackPanel.Background>

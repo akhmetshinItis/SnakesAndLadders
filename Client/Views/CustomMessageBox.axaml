@@ -76,7 +76,16 @@
                     Foreground="Black"
                     Click="OnOkButtonClick"
                     FontSize="16"
-                    FontWeight="Bold"/>
+                    FontWeight="Bold"
+                    Name="Ok"/>
+			<TextBlock Text="Имя или цвет уже заняты"
+			           IsVisible="False"
+			           HorizontalAlignment="Center"
+			           Margin="0,10"
+			           Foreground="Black"
+			           FontWeight="Bold"
+			           FontSize="16"
+			           Name="Notification"/>
 		</StackPanel>
 	</Grid>
 </Window>

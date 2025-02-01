@@ -104,6 +104,15 @@ namespace TCPServer
             var player = XPacketConverter.Deserialize<XPacketPlayer>(packet);
             Console.WriteLine("Player Name: " + player.Name);
             Console.WriteLine("Player Color " + player.Color);
+            if (Storage.AvalibleColors[player.Color] == 0 || Storage.Names.Contains(player.Name))
+            {
+                var pack = XPacket.Create(XPacketType.PlayerInfoNotAvailable);
+                QueuePacketSend(pack.ToPacket());
+                Server._clients.RemoveAt(Server._clients.Count - 1);
+                return;
+            }
+            Storage.AvalibleColors[player.Color] = 0;
+            Storage.Names.Add(player.Name);
             Name = player.Name;
             Color = player.Color;
             

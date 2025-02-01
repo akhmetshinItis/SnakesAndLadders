@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -34,8 +35,10 @@ namespace Client.Views
         private int _currentPosition = 0; // Позиция на поле (0 - старт)
         private const int _gridSize = 10; // Размер поля 10x10
         private const int _cellSize = 45; // Размер клетки 
-        
-        
+        private Dictionary<Path, int> _tokenPositions = new(); // Словарь: фишка → её текущая позиция
+        private Dictionary<string, Path> _playerTokens = new();  // Словарь: имя игрока → его фишка
+        public static string PlayerName { get; set; }
+        public static CustomMessageBox CustomMessageBox { get; set; }
         private Button? _toggleButton;
         public AlertMessageBox AlertMessage { get; set; }
         public MainWindow()
@@ -49,12 +52,8 @@ namespace Client.Views
             _rollDiceButton = this.FindControl<Button>("RollDiceButton");
             _playerToken = this.FindControl<Path>("PlayerToken");
 
-            if (_rollDiceButton != null)
-                _rollDiceButton.Click += RollDice_Click;
-
-            // Инициализируем фишку в начальной позиции
-            UpdateTokenPosition(-1);
-            
+            // if (_rollDiceButton != null)
+            //     _rollDiceButton.Click += RollDice_Click;
             
             ShowAlertWindow();
         }
@@ -70,15 +69,23 @@ namespace Client.Views
         {
             //var messageBox = new CustomMessageBox();
             //await messageBox.ShowDialog(this);
-            var customMessageBox = new CustomMessageBox(this);  // �������� ������� MainWindow
-            await customMessageBox.ShowDialog(this);  // ���������� ����
+            CustomMessageBox= new CustomMessageBox(this);  // �������� ������� MainWindow
+            await CustomMessageBox.ShowDialog(this);  // ���������� ����
         }
         
-        private void RollDice_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        //пока закомментил хочу переделать 
+        // private void RollDice_Click(object? sender, RoutedEventArgs e)
+        // {
+        //     int diceRoll = _random.Next(1, 7); // Бросок кубика (1-6)
+        //     int targetPosition = Math.Min(_currentPosition + diceRoll, _gridSize * _gridSize - 1);
+        //     MoveToken(_playerToken,_currentPosition, targetPosition);
+        //     _currentPosition = targetPosition;
+        // }
+
+        private async Task RollDice(int score)
         {
-            int diceRoll = _random.Next(1, 7); // Бросок кубика (1-6)
-            int targetPosition = Math.Min(_currentPosition + diceRoll, _gridSize * _gridSize - 1);
-            MoveToken(_currentPosition, targetPosition);
+            int targetPosition = Math.Min(_currentPosition + score, _gridSize * _gridSize - 1);
+            await MoveToken(_playerToken,_currentPosition, targetPosition);
             _currentPosition = targetPosition;
         }
 
@@ -115,42 +122,37 @@ namespace Client.Views
         //     _currentPosition = targetPosition;
         // }
         
-        
-        
-        
-        
-        
-        
-        private async void MoveToken(int start, int end)
+        private async Task MoveToken(Path token, int start, int end)
         {
-            if (_playerToken == null) return;
+            if (token == null || !_tokenPositions.ContainsKey(token)) return;
 
             int steps = end - start;
 
             for (int i = 0; i < steps; i++)
             {
-                _currentPosition++;
-                await SmoothMoveTo(_currentPosition);
+                _tokenPositions[token]++;  // Обновляем позицию в словаре
+                await SmoothMoveTo(token, _tokenPositions[token]); // Передаём фишку и новую позицию
             }
         }
-        
+
+
         /// <summary>
-        /// Плавно перемещает фишку в новую клетку
+        /// Плавно перемещает указанную фишку в новую клетку
         /// </summary>
-        private async Task SmoothMoveTo(int position)
+        private async Task SmoothMoveTo(Path token, int position)
         {
-            if (_playerToken == null) return;
+            if (token == null) return;
 
             int row = _gridSize - 1 - (position / _gridSize);
             int col = (position / _gridSize) % 2 == 0
                 ? position % _gridSize
                 : _gridSize - 1 - (position % _gridSize);
 
-            double targetX = col * _cellSize + (_cellSize - _playerToken.Width) / 2;
-            double targetY = row * _cellSize + _cellSize - _playerToken.Height;
+            double targetX = col * _cellSize + (_cellSize - token.Width) / 2;
+            double targetY = row * _cellSize + _cellSize - token.Height;
 
-            double startX = Canvas.GetLeft(_playerToken);
-            double startY = Canvas.GetTop(_playerToken);
+            double startX = Canvas.GetLeft(token);
+            double startY = Canvas.GetTop(token);
 
             int frames = 20;
             double dx = (targetX - startX) / frames;
@@ -158,28 +160,42 @@ namespace Client.Views
 
             for (int i = 0; i < frames; i++)
             {
-                Canvas.SetLeft(_playerToken, startX + dx * (i + 1));
-                Canvas.SetTop(_playerToken, startY + dy * (i + 1));
+                double newX = startX + dx * (i + 1);
+                double newY = startY + dy * (i + 1);
+                
+                Canvas.SetLeft(token, Math.Round(newX, 2));
+                Canvas.SetTop(token, Math.Round(newY, 2));
 
-                await Task.Delay(30);
+                await Task.Delay(16); // 16 мс для плавного 60 FPS
             }
         }
 
-        private void UpdateTokenPosition(int position)
+        private void UpdateTokenPosition(Path token, int position)
         {
-            if (_playerToken == null) return;
+            if (token == null) return;
+
+            // Обновляем позицию в словаре
+            if (_tokenPositions.ContainsKey(token))
+            {
+                _tokenPositions[token] = position;
+            }
+            else
+            {
+                _tokenPositions.Add(token, position);
+            }
 
             int row = _gridSize - 1 - (position / _gridSize);
             int col = (position / _gridSize) % 2 == 0
                 ? position % _gridSize
                 : _gridSize - 1 - (position % _gridSize);
 
-            double xPos = col * _cellSize + (_cellSize - _playerToken.Width) / 2;
-            double yPos = row * _cellSize + _cellSize - _playerToken.Height; // Смещение вниз
+            double xPos = col * _cellSize + (_cellSize - token.Width) / 2 + _random.Next(20, 50);
+            double yPos = row * _cellSize + _cellSize - token.Height + _random.Next(20, 50);
 
-            Canvas.SetLeft(_playerToken, xPos);
-            Canvas.SetTop(_playerToken, yPos);
+            Canvas.SetLeft(token, xPos);
+            Canvas.SetTop(token, yPos);
         }
+
         
         //public void AddPlayerInfo(string playerName, string color)
         //{
@@ -215,7 +231,7 @@ namespace Client.Views
         //    PlayersListPanel.Children.Add(playerPanel);
         //}
 
-        public void AddPlayerInfo(string playerName, string color)
+        public void AddPlayerInfo(string playerName, string color, bool isClient = false)
         {
             var playerPanel = new StackPanel
             {
@@ -247,7 +263,7 @@ namespace Client.Views
             PlayersListPanel.Children.Add(playerPanel);
 
             // Добавляем фишку игрока
-            AddPlayerToken(color);
+            AddPlayerToken(playerName, color, isClient);
         }
 
 
@@ -278,9 +294,9 @@ namespace Client.Views
 
         //    MainGrid.Children.Add(tokenContainer);
         //}
-        private void AddPlayerToken(string color)
+        public void AddPlayerToken(string playerName, string color, bool isClient = false)
         {
-            _playerToken = new Path
+            var newToken = new Path
             {
                 Width = 22.5,
                 Height = 60,
@@ -290,15 +306,21 @@ namespace Client.Views
                 StrokeThickness = 1.5
             };
 
-            TokenLayer.Children.Clear(); // Удаляем старую фишку
-            TokenLayer.Children.Add(_playerToken);
+            // Если это первая фишка, сохраняем её в _playerToken
+            if (_playerTokens.Count == 0 || isClient)
+            {
+                _playerToken = newToken;
+            }
 
-            // Устанавливаем начальное положение
-            UpdateTokenPosition(-1);
+            _playerTokens[playerName] = newToken; // Добавляем фишку в словарь
+            _tokenPositions[newToken] = -1; // Сохраняем начальную позицию фишки
+            TokenLayer.Children.Add(newToken); // Добавляем на поле
+
+            UpdateTokenPosition(newToken, -1); // Устанавливаем начальную позицию
         }
 
 
-        // логика кубикка
+        // логика кубика
         protected override void OnOpened(EventArgs e)
         {
             base.OnOpened(e);
@@ -329,25 +351,64 @@ namespace Client.Views
             _rollDiceButton.Click += ToggleImageChanging;
         }
 
-        private void ToggleImageChanging(object? sender, EventArgs e)
+        // private void ToggleImageChanging(object? sender, EventArgs e)
+        // {
+        //     if (_imageView is null) return;
+        //
+        //     if (_isRunning)
+        //     {
+        //         _timer_img?.Stop();
+        //         _isRunning = false;
+        //     }
+        //     else
+        //     {
+        //         _timer_img = new DispatcherTimer
+        //         {
+        //             Interval = TimeSpan.FromSeconds(0.08)
+        //         };
+        //         _timer_img.Tick += (s, args) => ChangeImage();
+        //         _timer_img.Start();
+        //         _isRunning = true;
+        //     }
+        // }
+        
+        private async void ToggleImageChanging(object? sender, EventArgs e)
         {
-            if (_imageView is null) return;
+            if (_imageView is null || _imagePaths.Count == 0) return;
 
+            _rollDiceButton.IsEnabled = false;
+
+            // Если анимация уже идет, остановим её
             if (_isRunning)
             {
                 _timer_img?.Stop();
                 _isRunning = false;
+                return;
             }
-            else
+
+            // Начинаем анимацию
+            _timer_img = new DispatcherTimer
             {
-                _timer_img = new DispatcherTimer
-                {
-                    Interval = TimeSpan.FromSeconds(0.08)
-                };
-                _timer_img.Tick += (s, args) => ChangeImage();
-                _timer_img.Start();
-                _isRunning = true;
-            }
+                Interval = TimeSpan.FromSeconds(0.1) // Промежуток между изменениями изображений
+            };
+    
+            _timer_img.Tick += (s, args) => ChangeImage(); // Меняем изображение каждый тик
+            _timer_img.Start();
+
+            _isRunning = true;
+
+            await Task.Delay(2000);
+
+            _timer_img.Stop();
+            _isRunning = false;
+
+            // Определяем результат по последнему изображению
+            string lastImage = _imagePaths[_random_img.Next(_imagePaths.Count)];
+            _imageView.Source = new Bitmap(lastImage);
+            var score = GetDiceResultFromImage(lastImage);
+            Console.WriteLine($"Анимация завершена! Результат: {score}");
+            await RollDice(Int32.Parse(score));
+            _rollDiceButton.IsEnabled = true;
         }
 
         private void ChangeImage()
@@ -357,5 +418,48 @@ namespace Client.Views
             string randomImage = _imagePaths[_random_img.Next(_imagePaths.Count)];
             _imageView.Source = new Bitmap(randomImage);
         }
+        
+        private string GetDiceResultFromImage(string imagePath)
+        {
+            var fileName = imagePath[^7];
+            return fileName.ToString();
+        }
+
+        public void DeletePlayer(string playerName, string color)
+        {
+            StackPanel? playerToRemove = null;
+
+            foreach (var child in PlayersListPanel.Children)
+            {
+                if (child is StackPanel playerPanel)
+                {
+                    var textBlock = playerPanel.Children.OfType<TextBlock>().FirstOrDefault();
+                    if (textBlock != null && textBlock.Text == playerName)
+                    {
+                        playerToRemove = playerPanel;
+                        break;
+                    }
+                }
+            }
+
+            if (playerToRemove != null)
+            {
+                PlayersListPanel.Children.Remove(playerToRemove);
+            }
+
+            RemovePlayerToken(color);
+        }
+
+        private void RemovePlayerToken(string color)
+        {
+            var tokenToRemove = TokenLayer.Children.OfType<Path>()
+                .FirstOrDefault(token => ((SolidColorBrush)token.Fill).Color == Avalonia.Media.Color.Parse(color));
+
+            if (tokenToRemove != null)
+            {
+                TokenLayer.Children.Remove(tokenToRemove);
+            }
+        }
+
     }
 }
