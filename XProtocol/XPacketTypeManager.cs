@@ -16,6 +16,8 @@ namespace XProtocol
             RegisterType(XPacketType.RequestPlayerInfo, 4, 0);
             RegisterType(XPacketType.DisconnectPlayer, 5, 0);
             RegisterType(XPacketType.PlayerInfoNotAvailable, 6, 0);
+            RegisterType(XPacketType.RollDice, 7, 0);
+            RegisterType(XPacketType.ChangeTurn, 8, 0);
         }
 
         public static void RegisterType(XPacketType type, byte btype, byte bsubtype)

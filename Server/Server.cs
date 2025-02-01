@@ -68,19 +68,30 @@ namespace TCPServer
 
                 var c = new ConnectedClient(client, this);
                 _clients.Add(c);
+                if (_clients.Count == 1)
+                {
+                    c.IsFirst = true;
+                }
             }
         }
 
-        public void SendToClients(ConnectedClient? callingClient, XPacket packet, bool skipCaller = true)
+        public async Task SendToClients(ConnectedClient? callingClient, XPacket packet, bool skipCaller = true)
         {
             foreach (var client in _clients)
             {
                 if (callingClient != null && client == callingClient && skipCaller)
                     continue;
                 
-                client.QueuePacketSend(packet.ToPacket());
-                
+                await Task.Run(() => client.QueuePacketSend(packet.ToPacket()));
             }
+        }
+
+        public async Task ChangeTurn(ConnectedClient callingClient)
+        {
+            var index = _clients.IndexOf(callingClient);
+            var client = _clients[(index + 1) % _clients.Count];
+            var pack = XPacket.Create(XPacketType.ChangeTurn);
+            await Task.Run(() => client.QueuePacketSend(pack.ToPacket()));
         }
 
         public async Task SendAllClientsToCaller(ConnectedClient callingClient, bool skipCaller = true)

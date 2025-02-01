@@ -7,6 +7,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Client.Enums;
 using Client.Network;
 using Colors = Client.Enums.Colors;
 
@@ -18,9 +19,7 @@ namespace Client.Views
         private string _playerName = ""; // Хранит имя игрока
         private readonly MainWindow _mainWindow;
         private bool _isProcessing = false;
-
-
-
+        
         //public CustomMessageBox()
         //{
         //    InitializeComponent(); // Загружаем XAML перед изменениями
@@ -73,7 +72,7 @@ namespace Client.Views
             _isProcessing = true;
             Ok.IsEnabled = false;
             _playerName = UserInputTextBox.Text; // Получаем имя игрока из текстового поля
-            MainWindow.PlayerName = _playerName;
+            Storage.Name = _playerName;
             if (!string.IsNullOrWhiteSpace(_playerName) && _selectedColor != "None")
             {
                 // _mainWindow.AddPlayerInfo(_playerName, _selectedColor);
@@ -96,14 +95,14 @@ namespace Client.Views
                 await Task.Delay(100);
                 await PacketSender.SendNewPlayerPacket(_playerName, Colors.GetColorId(_selectedColor));
                 await Task.Delay(100);
-                if (PacketProcessor.CorrectInf)
+                if (Storage.CorrectInf)
                 {
                     // при такой реализации не будет работать проверка на цвет для второго юзера хз что делать с этим пока что
                     await PacketSender.SendPlayersInfoRequest();
                     await Task.Delay(100);
                     Close();
                 }
-                PacketProcessor.CorrectInf = true;
+                Storage.CorrectInf = true;
                 Notification.IsVisible = true;
                 Ok.IsEnabled = true;
                 _isProcessing = false;

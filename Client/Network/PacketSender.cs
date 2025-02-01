@@ -20,15 +20,13 @@ namespace Client.Network ;
 
         public static async Task SendNewPlayerPacket(string playerName, int playerColor)
         {
-            if (Client.AvailibleColors[playerColor] == 0)
+            if (Storage.AvailibleColors[playerColor] == 0)
             {
                 Console.WriteLine("Цвет занят");
-                // await MainWindow.CustomMessageBox.ShowDialog(MainWindow);
-                MainWindow.CustomMessageBox.UserInputTextBox.Watermark = "ЦВЕТ ИЛИ ИМЯ УЖЕ ЗАНЯТЫ";
                 return;
             }
             
-            Client.Name = playerName;
+            Storage.Name = playerName;
             var pack = XPacketConverter.Serialize(
                 XPacketType.NewPlayer,
                 new XPacketPlayer
@@ -36,6 +34,17 @@ namespace Client.Network ;
                     Color = playerColor,
                     Name = playerName,
                 });
+            await Task.Delay(100);
+            await Task.Run(() => Client!.QueuePacketSend(pack.ToPacket()));
+        }
+
+        public static async Task SendRollDice(string playerName, int playerScore)
+        {
+            var pack = XPacketConverter.Serialize(XPacketType.RollDice, new XPacketRollDice
+            {
+                Name = playerName,
+                Score = playerScore,
+            });
             await Task.Delay(100);
             await Task.Run(() => Client!.QueuePacketSend(pack.ToPacket()));
         }

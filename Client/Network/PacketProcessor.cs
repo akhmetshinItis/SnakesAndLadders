@@ -17,8 +17,6 @@ namespace Client.Network ;
         public static CustomMessageBox? CustomMessageBox { get; set; }
         private static TaskCompletionSource<bool> _handshakeCompletionSource;
         internal static XClient? Client { get; set; }
-        private static int _handshakeMagic;
-        public static bool CorrectInf = true;
 
         private static void OnPacketRecieve(byte[] packet)
         {
@@ -50,6 +48,12 @@ namespace Client.Network ;
                 case XPacketType.PlayerInfoNotAvailable:
                     ProcessPlayerInfoNotAvailable(packet);
                     break;
+                case XPacketType.ChangeTurn:
+                    ProcessChangeTurn(packet);
+                    break;
+                case XPacketType.RollDice:
+                    ProcessRollDice(packet);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -65,7 +69,7 @@ namespace Client.Network ;
             await Task.Run(() => Client.Connect("127.0.0.1", 4910));
 
             var rand = new Random();
-            _handshakeMagic = rand.Next();
+            Storage.HandshakeMagic = rand.Next();
 
             Console.WriteLine("Sending handshake packet..");
 
@@ -75,7 +79,7 @@ namespace Client.Network ;
                     XPacketType.Handshake,
                     new XPacketHandshake
                     {
-                        MagicHandshakeNumber = _handshakeMagic
+                        MagicHandshakeNumber = Storage.HandshakeMagic
                     })
                     .ToPacket());
 
@@ -90,8 +94,8 @@ namespace Client.Network ;
             var player = XPacketConverter.Deserialize<XPacketPlayer>(packet);
             Console.WriteLine(player.Name);
             Console.WriteLine(player.Color);
-            Client.AvailibleColors[player.Color] = 0;
-            bool flag = player.Name.Equals(Client.Name);
+            Storage.AvailibleColors[player.Color] = 0;
+            bool flag = player.Name.Equals(Storage.Name);
             Dispatcher.UIThread.InvokeAsync(() =>
             {
                 MainWindow.AddPlayerInfo(player.Name, Colors.GetColor(player.Color), flag);
@@ -103,7 +107,7 @@ namespace Client.Network ;
         {
             var handshake = XPacketConverter.Deserialize<XPacketHandshake>(packet);
 
-            if (_handshakeMagic - handshake.MagicHandshakeNumber == 15)
+            if (Storage.HandshakeMagic - handshake.MagicHandshakeNumber == 15)
             {
                 Console.WriteLine("Handshake successful!");
                 _handshakeCompletionSource.SetResult(true);
@@ -125,6 +129,25 @@ namespace Client.Network ;
 
         private static void ProcessPlayerInfoNotAvailable(XPacket packet)
         {
-            CorrectInf = false;
+            Storage.CorrectInf = false;
+        }
+
+        private static void ProcessChangeTurn(XPacket packet)
+        {
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                MainWindow!.RollDiceButton.IsEnabled = true;
+            });
+        }
+
+        private static async Task ProcessRollDice(XPacket packet)
+        {
+            var rollDice = XPacketConverter.Deserialize<XPacketRollDice>(packet);
+            var token = Storage.PlayerTokens[rollDice.Name];
+            var currentPosition = Storage.TokenPositions[token];
+            await Dispatcher.UIThread.InvokeAsync(async () =>
+            {
+                await MainWindow.MoveToken(token, currentPosition, currentPosition + rollDice.Score);
+            });
         }
     }
