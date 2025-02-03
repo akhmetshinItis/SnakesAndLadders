@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Text.Json;
 using XProtocol;
 using XProtocol.Serializator;
 
 namespace TCPServer
 {
-    // TODO на дисконнект обновлять список занятых цветов не давать пустое имя
     internal class Server
     {
         private readonly Socket _socket;
@@ -135,7 +130,9 @@ namespace TCPServer
                             Name = client.Name,
                             Color = client.Color,
                         });
-                        SendToClients(client, pack, false);
+                        await SendToClients(client, pack, false);
+                        Storage.Names.Remove(client.Name);
+                        Storage.AvalibleColors[client.Color] = client.Color;
                     }
                 }
 

@@ -11,6 +11,15 @@ namespace Client.Enums ;
         public static bool CorrectInf = true;
         public static Dictionary<Path, int> TokenPositions = new(); // Словарь: фишка → её текущая позиция
         public static Dictionary<string, Path> PlayerTokens = new();  // Словарь: имя игрока → его фишка
+        
+        public const int GridSize = 10; // Размер поля 10x10
+        public const int СellSize = 45; // Размер клетки 
+        
+        /// <summary>
+        /// Внимание координаты тут не совпадают с координатами на картинке, решение не очень, но зато быстро
+        /// для тех кто будет что-то править потом
+        /// на поле клеточки нумеруются с 0, поэтому надо менять корды змеек и лестниц
+        /// </summary>
         public static readonly Dictionary<int, int> SnakesAndLadders = new()
         {
             { 0, 37 }, { 3, 13 }, { 8, 30 }, { 20, 41 }, { 27, 83 }, // Лестницы

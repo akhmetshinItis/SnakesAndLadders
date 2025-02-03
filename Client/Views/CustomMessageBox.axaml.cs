@@ -18,15 +18,10 @@ namespace Client.Views
         private string _selectedColor = "None"; // Хранит выбранный цвет
         private string _playerName = ""; // Хранит имя игрока
         private readonly MainWindow _mainWindow;
-        private bool _isProcessing = false;
-        
-        //public CustomMessageBox()
-        //{
-        //    InitializeComponent(); // Загружаем XAML перед изменениями
-        //}
+        private bool _isProcessing { get; set; } = false;
         public CustomMessageBox(MainWindow mainWindow)
         {
-            _mainWindow = mainWindow;  // Сохраняем ссылку на главное окно
+            _mainWindow = mainWindow;
             InitializeComponent();
         }
         
@@ -47,7 +42,7 @@ namespace Client.Views
                     {
                         clickedButton.BorderBrush = Brushes.Black;
                         clickedButton.BorderThickness = new Thickness(3);
-                    }, Avalonia.Threading.DispatcherPriority.Background);
+                    }, DispatcherPriority.Background);
                 }
             }
         }
@@ -71,12 +66,10 @@ namespace Client.Views
             if(_isProcessing) return;
             _isProcessing = true;
             Ok.IsEnabled = false;
-            _playerName = UserInputTextBox.Text; // Получаем имя игрока из текстового поля
+            _playerName = UserInputTextBox.Text;
             Storage.Name = _playerName;
             if (!string.IsNullOrWhiteSpace(_playerName) && _selectedColor != "None")
             {
-                // _mainWindow.AddPlayerInfo(_playerName, _selectedColor);
-
                 try
                 {
                     await PacketProcessor.ConnectAndSendHandshakeAsync();
@@ -84,6 +77,9 @@ namespace Client.Views
                 catch (Exception ex)
                 {
                     Console.WriteLine("Подключение не удалось: " + ex.Message);
+                    ServerNotAvailible.IsVisible = true;
+                    _isProcessing = false;
+                    return;
                 }
                 finally
                 {
@@ -97,7 +93,6 @@ namespace Client.Views
                 await Task.Delay(100);
                 if (Storage.CorrectInf)
                 {
-                    // при такой реализации не будет работать проверка на цвет для второго юзера хз что делать с этим пока что
                     await PacketSender.SendPlayersInfoRequest();
                     await Task.Delay(100);
                     Close();
@@ -106,6 +101,13 @@ namespace Client.Views
                 Notification.IsVisible = true;
                 Ok.IsEnabled = true;
                 _isProcessing = false;
+            }
+            else
+            {
+                ColorOrNameNotSelected.IsVisible = true;
+                Ok.IsEnabled = true;
+                _isProcessing = false;
+                return;
             }
         }
         }
