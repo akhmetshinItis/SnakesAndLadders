@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Client.Views.WinMessageBox"
+        Title="Победа!"
+        Width="400" Height="200">
+	<Grid>
+		<Image Source="/Assets/Images/blue-background.jpg"
+               Stretch="UniformToFill"
+               HorizontalAlignment="Stretch"
+               VerticalAlignment="Stretch" />
+
+		<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10">
+			<TextBlock x:Name="WinnerText"
+                       HorizontalAlignment="Center"
+                       Margin="0,20,0,20"
+                       Text="Игру выиграл игрок: {имя}"
+                       Foreground="Black"
+                       FontWeight="Bold"
+                       FontSize="20"/>
+
+			<Button Content="OK"
+                    HorizontalAlignment="Center"
+                    Width="80"
+                    Foreground="Black"
+                    Click="OnOkButtonClick"
+                    FontSize="16"
+                    FontWeight="Bold"
+                    Name="Ok"/>
+		</StackPanel>
+	</Grid>
+</Window>
