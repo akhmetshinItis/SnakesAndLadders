@@ -9,6 +9,7 @@ using XProtocol.Serializator;
 
 namespace TCPServer
 {
+    // TODO на дисконнект обновлять список занятых цветов не давать пустое имя
     internal class Server
     {
         private readonly Socket _socket;

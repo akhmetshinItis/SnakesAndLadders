@@ -28,7 +28,7 @@ namespace Client.Network ;
             }
         }
         
-        private static void ProcessIncomingPacket(XPacket packet)
+        private static async Task ProcessIncomingPacket(XPacket packet)
         {
             var type = XPacketTypeManager.GetTypeFromPacket(packet);
 
@@ -52,7 +52,7 @@ namespace Client.Network ;
                     ProcessChangeTurn(packet);
                     break;
                 case XPacketType.RollDice:
-                    ProcessRollDice(packet);
+                    await ProcessRollDice(packet);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

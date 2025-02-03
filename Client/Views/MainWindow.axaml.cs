@@ -135,35 +135,27 @@ namespace Client.Views
             if (token == null || !Storage.TokenPositions.ContainsKey(token)) return;
 
             int steps = Math.Abs(end - start);
-
-            // Обычное пошаговое движение до конечной позиции
+            Console.WriteLine($"Moving {steps} steps from {start} to {end}");
             for (int i = 0; i < steps; i++)
             {
-                Storage.TokenPositions[token]++;  // Обновляем позицию в словаре
-                await SmoothMoveTo(token, Storage.TokenPositions[token]); // Двигаем фишку обычным способом
+                Storage.TokenPositions[token]++;
+                await SmoothMoveTo(token, Storage.TokenPositions[token]);
             }
 
-            // Теперь обновляем текущую позицию фишки
-            _currentPosition = end;
-
+            Console.WriteLine(Storage.TokenPositions[token]);
             // Проверяем, есть ли на этой клетке лестница или змея
-            if (Storage.SnakesAndLadders.TryGetValue(_currentPosition, out int newPosition))
+            if (Storage.SnakesAndLadders.TryGetValue(Storage.TokenPositions[token], out int newPosition))
             {
+                Console.WriteLine("SNL " + newPosition);
                 // Перемещаем фишку по диагонали к новой позиции
-                await SmoothDiagonalMoveTo(token, _currentPosition, newPosition);
-
+                await SmoothDiagonalMoveTo(token, Storage.TokenPositions[token], newPosition);
+            
                 // Обновляем текущую позицию фишки
-                _currentPosition = newPosition;
                 Storage.TokenPositions[token] = newPosition;
-            }
-            else
-            {
-                // Если лестницы или змеи нет, обновляем позицию в словаре
-                Storage.TokenPositions[token] = _currentPosition;
             }
 
             // Проверка, достиг ли игрок последней клетки
-            if (_currentPosition == (_gridSize * _gridSize - 1))
+            if (Storage.TokenPositions[token] == (_gridSize * _gridSize - 1))
             {
                 await ShowWinMessageBox(token); // Показываем окно о победе
             }
