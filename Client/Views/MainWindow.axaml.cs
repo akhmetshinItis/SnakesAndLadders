@@ -39,6 +39,8 @@ namespace Client.Views
         private const int _cellSize = 45; // Размер клетки 
         public static CustomMessageBox CustomMessageBox { get; set; }
         private Button? _toggleButton;
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -62,64 +64,113 @@ namespace Client.Views
             CustomMessageBox= new CustomMessageBox(this);  // �������� ������� MainWindow
             await CustomMessageBox.ShowDialog(this);  // ���������� ����
         }
-        
-        //пока закомментил хочу переделать 
-        // private void RollDice_Click(object? sender, RoutedEventArgs e)
-        // {
-        //     int diceRoll = _random.Next(1, 7); // Бросок кубика (1-6)
-        //     int targetPosition = Math.Min(_currentPosition + diceRoll, _gridSize * _gridSize - 1);
-        //     MoveToken(_playerToken,_currentPosition, targetPosition);
-        //     _currentPosition = targetPosition;
-        // }
 
+        private async Task ShowWinMessageBox(Path token)
+        {
+            // Получаем имя игрока по его фишке
+            string playerName = Storage.PlayerTokens.FirstOrDefault(x => x.Value == token).Key;
+
+            // Создаем и показываем окно с сообщением о победе
+            WinMessageBox winMessageBox = new WinMessageBox(playerName);
+            await winMessageBox.ShowDialog(this); // Открываем окно как модальное
+        }
+
+        ////пока закомментил хочу переделать 
+        //// private void RollDice_Click(object? sender, RoutedEventArgs e)
+        //// {
+        ////     int diceRoll = _random.Next(1, 7); // Бросок кубика (1-6)
+        ////     int targetPosition = Math.Min(_currentPosition + diceRoll, _gridSize * _gridSize - 1);
+        ////     MoveToken(_playerToken,_currentPosition, targetPosition);
+        ////     _currentPosition = targetPosition;
+        //// }
+
+        //private async Task RollDice(int score)
+        //{
+        //    int targetPosition = Math.Min(_currentPosition + score, _gridSize * _gridSize - 1);
+        //    await MoveToken(_playerToken,_currentPosition, targetPosition);
+        //    _currentPosition = targetPosition;
+        //}
         private async Task RollDice(int score)
         {
             int targetPosition = Math.Min(_currentPosition + score, _gridSize * _gridSize - 1);
-            await MoveToken(_playerToken,_currentPosition, targetPosition);
-            _currentPosition = targetPosition;
+            await MoveToken(_playerToken, _currentPosition, targetPosition);
+           
         }
 
-        // Это нужно чтобы учитывать змеи/лестницы (сначала надо починить, чтобы фишка ходила ровно, а не как АЛКОГОЛИК
-        
-        
-        
-        // private void RollDice_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-        // {
-        //     int diceRoll = _random.Next(1, 7); // Бросок кубика (1-6)
-        //     int targetPosition = Math.Min(_currentPosition + diceRoll, _gridSize * _gridSize - 1);
-        //
-        //     MoveToken(_currentPosition, targetPosition);
-        //
-        //     // Проверяем, попал ли игрок на змею или лестницу
-        //     if (_snakesAndLadders.ContainsKey(targetPosition))
-        //     {
-        //         int newPosition = _snakesAndLadders[targetPosition];
-        //         MoveToken(targetPosition, newPosition); // Перемещаем фишку
-        //         targetPosition = newPosition; // Обновляем текущую позицию
-        //     }
-        
-        //     _currentPosition = targetPosition;
-        // }
-        
+
+        //public async Task MoveToken(Path token, int start, int end)
+        //{
+        //    if (token == null || !Storage.TokenPositions.ContainsKey(token)) return;
+
+        //    int steps = Math.Abs(end - start);
+
+        //    // Обычное пошаговое движение до конечной позиции
+        //    for (int i = 0; i < steps; i++)
+        //    {
+        //        Storage.TokenPositions[token]++;  // Обновляем позицию в словаре
+        //        await SmoothMoveTo(token, Storage.TokenPositions[token]); // Двигаем фишку обычным способом
+        //    }
+
+        //    // Теперь обновляем текущую позицию фишки
+        //    _currentPosition = end;
+
+        //    // Проверяем, есть ли на этой клетке лестница или змея
+        //    if (Storage.SnakesAndLadders.TryGetValue(_currentPosition, out int newPosition))
+        //    {
+        //        // Перемещаем фишку по диагонали к новой позиции
+        //        await SmoothDiagonalMoveTo(token, _currentPosition, newPosition);
+
+        //        // Обновляем текущую позицию фишки
+        //        _currentPosition = newPosition;
+        //        Storage.TokenPositions[token] = newPosition;
+        //    }
+        //    else
+        //    {
+        //        // Если лестницы или змеи нет, обновляем позицию в словаре
+        //        Storage.TokenPositions[token] = _currentPosition;
+        //    }
+        //}
         public async Task MoveToken(Path token, int start, int end)
         {
-            if (token == null || ! Storage.TokenPositions.ContainsKey(token)) return;
+            if (token == null || !Storage.TokenPositions.ContainsKey(token)) return;
 
-            int steps = end - start;
+            int steps = Math.Abs(end - start);
 
+            // Обычное пошаговое движение до конечной позиции
             for (int i = 0; i < steps; i++)
             {
                 Storage.TokenPositions[token]++;  // Обновляем позицию в словаре
-                await SmoothMoveTo(token, Storage.TokenPositions[token]); // Передаём фишку и новую позицию
+                await SmoothMoveTo(token, Storage.TokenPositions[token]); // Двигаем фишку обычным способом
             }
-            
-            //надо разобраться
-            // if (Storage.SnakesAndLadders.ContainsKey(end))
-            // {
-            //     int newPosition = Storage.SnakesAndLadders[end];
-            //     await MoveToken(token,  end,newPosition); // Перемещаем фишку
-            // }
+
+            // Теперь обновляем текущую позицию фишки
+            _currentPosition = end;
+
+            // Проверяем, есть ли на этой клетке лестница или змея
+            if (Storage.SnakesAndLadders.TryGetValue(_currentPosition, out int newPosition))
+            {
+                // Перемещаем фишку по диагонали к новой позиции
+                await SmoothDiagonalMoveTo(token, _currentPosition, newPosition);
+
+                // Обновляем текущую позицию фишки
+                _currentPosition = newPosition;
+                Storage.TokenPositions[token] = newPosition;
+            }
+            else
+            {
+                // Если лестницы или змеи нет, обновляем позицию в словаре
+                Storage.TokenPositions[token] = _currentPosition;
+            }
+
+            // Проверка, достиг ли игрок последней клетки
+            if (_currentPosition == (_gridSize * _gridSize - 1))
+            {
+                await ShowWinMessageBox(token); // Показываем окно о победе
+            }
         }
+
+
+
 
 
         /// <summary>
@@ -155,6 +206,46 @@ namespace Client.Views
                 await Task.Delay(16); // 16 мс для плавного 60 FPS
             }
         }
+
+        private async Task SmoothDiagonalMoveTo(Path token, int startPosition, int targetPosition)
+        {
+            //targetPosition--;
+            if (token == null) return;
+
+            // Вычисляем координаты стартовой и целевой позиции
+            int startRow = _gridSize - 1 - (startPosition / _gridSize);
+            int startCol = (startPosition / _gridSize) % 2 == 0
+                ? startPosition % _gridSize
+                : _gridSize - 1 - (startPosition % _gridSize);
+
+            int targetRow = _gridSize - 1 - (targetPosition / _gridSize);
+            int targetCol = (targetPosition / _gridSize) % 2 == 0
+                ? targetPosition % _gridSize
+                : _gridSize - 1 - (targetPosition % _gridSize);
+
+            // Вычисляем координаты в пикселях
+            double startX = startCol * _cellSize + (_cellSize - token.Width) / 2;
+            double startY = startRow * _cellSize + _cellSize - token.Height;
+
+            double targetX = targetCol * _cellSize + (_cellSize - token.Width) / 2;
+            double targetY = targetRow * _cellSize + _cellSize - token.Height;
+
+            int frames = 20; // Количество кадров для анимации
+            double dx = (targetX - startX) / frames;
+            double dy = (targetY - startY) / frames;
+
+            for (int i = 0; i < frames; i++)
+            {
+                double newX = startX + dx * (i + 1);
+                double newY = startY + dy * (i + 1);
+
+                Canvas.SetLeft(token, Math.Round(newX, 2));
+                Canvas.SetTop(token, Math.Round(newY, 2));
+
+                await Task.Delay(16); // 16 мс для плавного 60 FPS
+            }
+        }
+
 
         private void UpdateTokenPosition(Path token, int position)
         {
